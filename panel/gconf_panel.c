@@ -7,7 +7,7 @@
 
 static GtkWidget *dialog;
 static GtkWidget *width_spin, *width_opt;
-static GtkWidget *xmargin_spin;
+static GtkWidget *xmargin_spin, *ymargin_spin;
 static GtkWidget *allign_opt;
 
 static gconf_block *gl_block;
@@ -241,6 +241,11 @@ mk_geom_block(xconf *xc)
     gconf_block_add(geom_block, gtk_label_new(_("X Margin")), TRUE);
     gconf_block_add(geom_block, w, FALSE);
     xmargin_spin = w;
+
+    w = gconf_edit_int(geom_block, xconf_get(xc, "ymargin"), 0, 300);
+    gconf_block_add(geom_block, gtk_label_new(_("Y Margin")), FALSE);
+    gconf_block_add(geom_block, w, FALSE);
+    ymargin_spin = w;
 
     gconf_block_add(gl_block, geom_block->main, TRUE);
 
