@@ -1,0 +1,57 @@
+BODY
+{
+    BACKGROUND-COLOR: #dddddd;
+    COLOR: #000000;
+    FONT-FAMILY: verdana,arial,helvetica;
+    FONT-SIZE: 12px;
+    MARGIN: 0px
+}
+TD
+{
+    FONT-FAMILY: verdana,arial,helvetica;
+    FONT-SIZE: 12px
+}
+A:link
+{
+    COLOR: #465ec9
+}
+A:visited
+{
+    COLOR: #242f6d
+}
+A:hover
+{
+    COLOR: #850000
+}
+
+/** my additions **/
+h5 {
+    font-size: 100%;
+}
+
+h2, h3, h4 {    
+    padding: 0em 0em;    
+    margin: 0em;     
+}
+
+blockquote {
+    margin: 1em;
+    padding: 0.5em;
+    border: 1px black solid;
+}
+
+pre {
+    margin: 1em;
+    padding: 0.5em;
+    border: 1px black solid;
+    font-size: 10px;
+}
+
+img {
+        border: 0px;
+}
+
+img.logo {
+	display: inline;
+	padding: 0.1em;
+}
