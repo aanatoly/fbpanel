@@ -1,0 +1,51 @@
+fbpanel is a lightweight, <a href="http://www.freedesktop.org/Standards/wm-spec">NETWM</a> compliant desktop panel.
+It works with any <a href="http://www.freedesktop.org/Standards/wm-spec">NETWM</a> compliant window manager (eg 
+<a href="http://xfce.org/">xfwm4</a>,
+<a href="http://sawmill.sourceforge.net/">sawfish</a>,
+<a href="http://www.icculus.org/openbox/">openbox</a>,
+<a href="http://www.gnome.org/softwaremap/projects/metacity/">metacity</a>,
+<a href="http://kde.org/">kde wm</a>
+)
+ <br/> <br/>
+<p style="align:left; margin: 2px;">
+<img src="images/fbpanel.png"  alt="fbpanel image"/>
+</p>
+<br/>
+It provides
+<ul>
+<li>variety of plugins:
+<ul>
+<li>taskbar</li>
+<li>pager</li>
+<li>'show desktop' button</li>
+<li>launchbar</li>
+<li>image viewer</li>
+<li>text clock</li>
+<li>digital clock</li>
+<li>tray (notification area) </li>
+<li>menu with support for freedesktop.org (as in GNOME/KDE) applications menu</li>
+<li>space filler</li>
+<li>cpu monitor</li>
+<li>network monitor</li>
+<li>memory monitor</li>
+<li>battery monitor</li>
+<li>volume regulator</li>
+<li>general monitor - puts output of configured command in a panel</li>
+</ul>
+</li>
+<li>ability to replace windows' icons</li>
+<li>all icons follow your current GTK+ icon theme</li>
+<li>transparency support</li>
+<li>customizable size and screen position</li>
+<li>ability to run many instances each with its own configuration</li>
+<li>modest resource usage</li>
+</ul>
+
+It's written in C and uses the <a href="http://www.gtk.org">GTK+</a> library
+only.<br/>
+
+<p>Latest version is 
+<a href="http://sourceforge.net/project/showfiles.php?group_id=66031">
+6.0</a>
+</p>
+

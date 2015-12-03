@@ -1,0 +1,59 @@
+#!/bin/sh
+
+function help ()
+{
+    echo "Usage: mk_gallery <file>"
+    echo "Creates HTML for screen shot gallery nd saves it in <file>"
+}
+
+if [ $# -ne 1 ]; then
+    help
+    exit 1
+fi
+
+# create table
+echo '<table style="align:left;" cellpadding="0" cellspacing="10" border="0">' > "$1"
+
+major_vers=`find . -type d -name '*.*-*' | sed -e 's/..//' -e 's/\..*//' | sort -run`
+for v in $major_vers; do
+
+    vers=`ls -d1 $v.* | sed -e 's/-..//' | sort -unr -k 1.3`
+    for i in $vers; do
+        if [ "$i" = "2.x" ]; then
+            echo '<tr><td>' "<h3>Version $i (gtk1)</h3>" '</td></tr>' >> "$1"
+        else
+            echo '<tr><td>' "<h3>Version $i</h3>" '</td></tr>' >> "$1"
+        fi
+        echo "Ver $i"
+        shot_dirs=`ls -1d $i-* | sort -n`
+        # start from new row
+        br="x"
+        for dir in $shot_dirs; do
+            echo "  $dir"
+            shot=shots/`ls -1 $dir/shot.*`
+            thumb=shots/`ls -1 $dir/thumb.*`
+            text=$dir/text.html
+            if [ "$br" = "x" ]; then
+                echo "<tr valign=\"top\">" >> "$1"
+            fi
+            # make cell with thumbnail
+            echo "<td style=\"width:33%\"> <a href=\"$shot\">" >> "$1"
+            echo "   <img src=\"$thumb\" style=\"border: 1px solid ;\" \
+                 alt=\"shot\"/> </a> <br/>" >> "$1"
+            cat $text 2>/dev/null  >> "$1"
+            echo "</td>"   >> "$1"
+            br="x$br"
+            # if it's 3rd cell in a row, start new row
+            if [ "$br" = "xxxx" ]; then
+                br="x"
+                echo "</tr>" >> "$1"
+            fi
+        done
+        if [ "$br" != "x" ]; then
+            echo "</tr>" >> "$1"
+        fi
+
+    done
+done
+echo "<tr><td></td></tr>" >> "$1"
+echo "</table>" >> "$1"
