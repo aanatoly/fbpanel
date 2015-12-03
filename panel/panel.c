@@ -68,14 +68,14 @@ panel_set_wm_strut(panel *p)
         break;
     case EDGE_TOP:
         i = 2;
-        data[i] = p->ah;
+        data[i] = p->ah + p->ymargin;
         data[4 + i*2] = p->ax;
         data[5 + i*2] = p->ax + p->aw;
         if (p->autohide) data[i] = p->height_when_hidden;
         break;
     case EDGE_BOTTOM:
         i = 3;
-        data[i] = p->ah;
+        data[i] = p->ah + p->ymargin;
         data[4 + i*2] = p->ax;
         data[5 + i*2] = p->ax + p->aw;
         if (p->autohide) data[i] = p->height_when_hidden;
