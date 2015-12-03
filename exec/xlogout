@@ -1,0 +1,49 @@
+#!/bin/bash
+
+# xlogout - logs user out of its X session
+# Linux specific since uses /proc
+
+# get display name without screen number
+[ -z "$DISPLAY" ] && exit 1
+DPY=${DISPLAY:1}
+DPY=${DPY/.*/}
+echo "DPY=${DPY}"
+
+# get X pid
+XPID=`< /tmp/.X${DPY}-lock`
+XPID=`echo $XPID`
+echo "XPID=$XPID"
+
+# get pid of xdm (or gdm, kdm, etc). usually it's parent of X
+XDMPID=`ps -o ppid --pid=$XPID | awk '{if (FNR != 1) print $1}'`
+echo "XDMPID=$XDMPID"
+
+# recursivly find child of xdm that was started in home dir - 
+# it's user's session start up script
+function pid_scan()
+{
+
+    rm -f $PF
+    while [ $# != 0 ]; do
+        ps --no-headers -o pid --ppid=$1 >> $PF
+        shift
+    done
+    for pid in `< $PF`; do
+        if cwd=`ls -al /proc/$pid/cwd 2>/dev/null`; then
+            cwd=`sed 's/.*-> //' <<< $cwd`
+            [ "$cwd" == "$HOME" ] && echo $pid && return
+        fi
+    done
+    pids=`< $PF`
+    [ -n "$pids" ] && pid_scan `< $PF`;
+}
+
+PF=/tmp/$$-pids
+SPID=`pid_scan $XDMPID`
+rm -f $PF
+
+[ -z "$SPID" ] && exit 1
+echo "Session start up script"
+ps -o uid,pid,ppid,sess,cmd --pid $SPID
+kill -SIGTERM -$SPID $SPID
+

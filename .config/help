@@ -1,0 +1,54 @@
+#!/usr/bin/python
+
+import re, os, sys, textwrap
+# Formats help message
+# $1 - help type: var, target or example
+
+text = sys.stdin.read()
+
+def fmt_2cols(name):
+    global text
+
+    text = re.sub('(?mi)\s*\n\s+', ' ', text)
+    text = [ t for t in text.split('\n') if t ]
+    cols = []
+    for t in text:
+        try:
+            (n, m) = t.split(' - ', 1)
+            cols.append((n.strip(), m.strip()))
+        except:
+            pass
+
+    m = max([ len(e[0]) for e in cols ])
+    ind = ' ' * m
+    text = ""
+    for c in cols:
+        help = textwrap.fill(c[1], initial_indent = ind,
+            subsequent_indent = ind)
+        text += '  {0:>{1}s} - {2}\n'.format(c[0],m, help.strip())
+    text.strip()
+
+    if text:
+        print "%s:\n%s" % (name, text)
+
+
+def fmt_pre():
+    tok = text.split('@@\n')
+    tok2 = []
+    for t in tok:
+        if t.strip():
+            tok2.append(t.strip())
+
+    for i, t in enumerate(tok2):
+        print 'Example %d:' % (i+1)
+        print t
+        print
+
+if sys.argv[1] == 'variable':
+    fmt_2cols('Variables')
+elif sys.argv[1] == 'target':
+    fmt_2cols('Targets')
+elif sys.argv[1] == 'example':
+    fmt_pre()
+else:
+    raise Exception, 'Unknown arg: ' + sys.argv[1]

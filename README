@@ -1,0 +1,64 @@
+                        fbpanel
+
+NAME
+        fbpanel is a lightweight GTK2-based panel for UNIX desktop
+
+SYNOPSYS
+        fbpanel [OPTION]...
+
+DESCRIPTION
+        fbpanel is desktop panel which provides graphical information and feedback about 
+        desktop activity and allows interaction with the window manager. 
+        It features:
+         o taskbar   - show list of the managed windows (tasks)
+         o pager     - thumbnailed view of the desktop
+         o launchbar - buttons to quickly launch applications
+         o show desktop - button to iconify or shade all windows 
+         o image     - display an image
+         o clock     - show the current time and/or date
+         o system tray  - tray for XEMBED icons (aka docklets)
+         o space     - just seize space
+	 o menu      - menu with text and images
+	 o deskno    - display desktop number and name
+        fbpanel requires NETWM (www.freedesktop.org) compliant window manager. 
+
+        You can run many instances of fbpanel each with its own configuration
+        (see OPTIONS below).
+
+        Most updated info about fbpanel can be found on its home page:
+                http://fbpanel.sf.net/
+
+OPTIONS
+     --help      -- print this help and exit
+     --version   -- print version and exit
+     --log <number> -- set log level 0-5. 0 - none 5 - chatty
+     --configure -- launch configuration utility
+     --profile name -- use specified profile
+
+     -h  -- same as --help
+     -p  -- same as --profile
+     -v  -- same as --version
+     -C  -- same as --configure
+
+                    
+CUSTOMIZATION
+        To change default settings, copy profile file to your home directory
+                mkdir -p ~/.fbpanel
+                cp /usr/share/fbpanel/default ~/.fbpanel
+        and edit it. Default profile file contains comments and explanation inside,
+        so it should be easy. For full list of options please visit fbpanel's home page
+
+FILES
+        /usr/share/fbpanel
+                Directory with system wide resources and default settings
+
+        ~/.fbpanel/
+                Directory with user's private configurations
+
+        ~/.fbpanel/default
+                Default profile
+
+AUTHORS
+        Anatoly Asviyan <aanatoly@users.sf.net>
+
+

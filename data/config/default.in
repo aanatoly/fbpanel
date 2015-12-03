@@ -1,0 +1,398 @@
+########################################
+## fbpanel configuration file         ##
+########################################
+
+
+# DESCRIPTION
+# Configuration file consists of mandatory 'Global' block that MUST come first,
+# and optionally one or more 'Plugin' block.
+# Lines having '#' as first non-blank char or blank lines are ignored
+# Keywords are not case-sensitive
+# Values are case-sensitive
+# Value of variable is a text from first non-blank char after '='
+# till the last non-blank char. '#' is NOT treated as coment in this context
+
+# 'Global' block describes global parameters like position, size and
+# some NETWM settings
+
+# Global {
+
+#     # screen edge
+#     # legal values are: left, right, top, bottom
+#     edge = bottom
+
+#     # allignment of a panel
+#     # legal values are: left, right, center
+#     allign = left
+
+#     # length of margin (in pixels)
+#     # legal values are numbers
+#     margin = 0
+
+#     # widthtype specifies how panel width is calculated
+#     # legal values are: request, pixel, percent
+#     #   request - follow widgets' size requests. can shrink or grow dynamically
+#     #   pixel   - occupy fixed number of pixels, then 'width' variable holds a number
+#     #   percent - be 'width' precent of an edge.
+#     widthType = percent
+
+#     # numerical value of width (not applicable for 'request' widthtype)
+#     # legal values are numbers
+#     width = 80
+
+#     # heighttype specifies how panel height is calculated
+#     # legal values are: pixel
+#     #   pixel   - ocupy fixed number of pixels, then 'height' variable holds a number
+#     heightType = pixel
+
+#     # numerical value of height (if applicable)
+#     # legal values are numbers
+#     height = 28
+
+
+#     # Identify panel window type as dock
+#     # legal values are boolean
+#     setDockType = true
+
+#     # Reserve panel's space so that it will not be covered by maximazied windows
+#     # legal values are boolean
+#     # setPartialStrut = true
+
+
+#     # Transparency stuff:
+#     # tintColor is a color to composite on root background given as #RRGGBB or as name
+#     # alpha is transparency of the tint color.
+#     # transparent = true
+#     # tintColor = #FFFFFF
+#         or
+#     # tintColor = white
+#     # alpha = 127
+
+#     # Autohide
+#     # autoHide = false
+#     # heightWhenHidden = 2
+
+# }
+
+
+
+# 'Plugin' block specifies a plugin to load. It has same syntax for both
+# builtin and external plugins.
+
+# First parameter is 'type'. It's mandatory and must come first
+# Legal values are plugin names. Names of builtin plugins are:
+# separator   - visual separator
+# wincmd      - 'show desktop' button
+# taskbar     - lists all opened windows (tasks)
+# launchbar   - bar with launch button
+# image       - just shows an image
+# dclock      - digital clock
+# space       - just seize space
+# pager       - thumbnailed view of the desktop
+# tray        - tray for XEMBED icons (aka docklets)
+
+# expand - specifies if plugin can accomodate extra space or not [optional]
+# padding - extra padding around plugin  [optional]
+# config {} - block of plugin's private configuration.
+#             This part is plugin  dependant
+
+
+#
+# Plugin {
+#     type = wincmd
+#     config {
+#         image = ~/.fbpanel/images/Desktop2.png
+#         tooltip = Left click to iconify all windows. Middle click to shade them.
+#     }
+# }
+
+
+Global {
+    edge = bottom
+    allign = center
+    margin = 0
+    widthtype = percent
+    width = 86
+    height = 24
+    transparent = true
+    tintcolor = #ffffff
+    alpha = 28
+    setdocktype = true
+    setpartialstrut = true
+    autohide = false
+    heightWhenHidden = 2
+    roundcorners = true
+    roundcornersradius = 7
+    layer = none
+    MaxElemHeight = 32
+}
+
+
+
+Plugin {
+    type = space
+    config {
+        size = 2
+    }
+}
+
+
+Plugin {
+    type = menu
+    config {
+        IconSize = 22
+        #icon = start-here
+        icon = logo
+        systemmenu {
+        }
+        separator {
+        }
+	menu {  
+	    name = Computer
+	    icon = computer
+            
+	    item {
+		name = Terminal
+		icon = terminal
+		action = x-terminal
+	    }
+            item {
+                name = Lock Display
+                icon = gnome-lockscreen
+                action = slock
+            }
+            separator {
+            }
+            item {
+                name = Reboot
+                icon = gnome-session-reboot
+                action = sudo reboot
+            }
+            item {
+                name = Shutdown
+                icon = gnome-session-halt
+                action = sudo shutdown -h now
+            }
+            item {
+                name = logout
+                icon = gnome-session-logout
+                action = @libexecdir@/xlogout
+            }
+        }
+    }
+}
+
+
+
+Plugin {
+    type = space
+    config {
+        size = 15
+    }
+}
+
+
+Plugin {
+    type = launchbar
+    config {
+        button {
+            icon = file-manager
+            tooltip = File Manager
+            action = x-file-manager
+        }
+        button {
+            icon = terminal
+            tooltip = Terminal
+            action = x-terminal
+        }
+	button {
+            icon = web-browser
+            tooltip = Web Browser
+            action = x-www-browser
+    	}
+    }
+}
+
+Plugin {
+    type = space
+    config {
+        size = 15
+    }
+}
+
+
+Plugin {
+    type = wincmd
+    config {
+        icon = gnome-fs-desktop
+        tooltip = Left click to iconify all windows. Middle click to shade them.
+    }
+}
+
+
+Plugin {
+    type = space
+    config {
+        size = 15
+    }
+}
+
+
+
+Plugin {
+    type = taskbar
+    expand = true
+    config {
+        ShowIconified = true
+        ShowMapped    = true
+        ShowAllDesks  = false
+        tooltips = true
+        IconsOnly = false
+        MaxTaskWidth = 150
+    }
+}
+
+
+Plugin {
+    type = space
+	config {
+	   size = 15
+	}
+}
+
+Plugin {
+    type = pager
+    config {
+        showwallpaper = true
+    }
+}
+
+Plugin {
+    type = space
+    config {
+        size = 10
+    }
+}
+
+Plugin {
+    type = mem
+    expand = false
+    padding = 2
+    config {
+        ShowSwap = false
+    }
+}
+
+Plugin {
+    type = cpu
+    config {
+        Color = green
+    }
+}
+
+Plugin {
+    type = net
+    expand = false
+    padding = 0
+    config {
+        #interface = ppp0
+        interface = eth0
+        # set connection limits to make traffic graph more accurate
+        TxLimit = 20
+        RxLimit = 190
+        TxColor = violet
+        RxColor = blue
+    }
+}
+
+
+Plugin {
+    type = space
+    config {
+        size = 10
+    }
+}
+
+plugin {
+    type = volume
+}
+
+#plugin {
+#    type = battery
+#}
+
+Plugin {
+    type = tray
+}
+
+Plugin {
+    type = space
+    config {
+        size = 10
+    }
+}
+
+# Digital Clock
+Plugin {
+    type = dclock
+    config {
+        ShowSeconds = false
+        HoursView = 24
+        TooltipFmt = %A %x
+        #Action = xmessage Please define some command &
+    }
+}
+
+# Text Clock
+# ClockFmt: (string) Clock format string.  May contain strftime conversion
+#           specifications and Pango markup information.
+# TooltipFmt: (string) Tooltip format string.
+# Action: (string) Shell command to execute when clock is clicked.
+# ShowCalendar: (boolean) Show a GTK calendar widget when the clock is
+#               clicked.  Only valid if Action is unset.
+# ShowTooltip: (boolean) Show tooltip for clock.
+#Plugin {
+#    type = tclock
+#    config {
+#        ClockFmt = <b>%I:%M</b>
+#        # 2 line view, time in bold above and date below
+#        # ClockFmt = <span font="Sans 8"><b>%-l:%M</b> %P&#xA;%a %B %-e</span>
+#        TooltipFmt = %A %x
+#        #Action = xmessage Please define some command &
+#        ShowCalendar = false
+#        ShowTooltip = true
+#    }
+#}
+
+# 'icons' plugin lets you customize window icons.
+# these changes apply to entire desktop
+Plugin {
+    type = icons
+    config {
+        DefaultIcon = %%datadir%%/fbpanel/images/default.xpm
+        application {
+            icon = gnome-terminal
+            ClassName = XTerm
+        }
+        application {
+            icon = gnome-terminal
+            ClassName = mlterm
+        }
+        application {
+            icon = gnome-terminal
+            ClassName = URxvt
+        }
+        application {
+            icon = gnome-emacs
+            ClassName = Emacs
+        }
+        application {
+            icon = mozilla-firefox
+            ClassName = Firefox-bin
+        }
+        application {
+            icon = mozilla-firefox
+            ClassName = Firefox
+        }
+    }
+}
