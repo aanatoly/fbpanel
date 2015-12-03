@@ -606,7 +606,10 @@ calculate_position(panel *np)
         np->aw = np->height;
         np->aw = MIN(PANEL_HEIGHT_MAX, np->aw);
         np->aw = MAX(PANEL_HEIGHT_MIN, np->aw);
-        np->ax = minx + ((np->edge == EDGE_LEFT) ? 0 : (sswidth - np->aw));
+        if (np->edge == EDGE_LEFT)
+            np->ax = np->ymargin;
+        else
+            np->ax = sswidth - np->aw - np->ymargin;
     }
     if (!np->aw)
         np->aw = 1;
