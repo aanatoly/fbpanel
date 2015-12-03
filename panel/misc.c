@@ -523,7 +523,7 @@ get_net_wm_window_type(Window win, net_wm_window_type *nwwt)
 
 
 static void
-calculate_width(int scrw, int wtype, int allign, int margin,
+calculate_width(int scrw, int wtype, int allign, int xmargin,
       int *panw, int *x)
 {
     ENTER;
@@ -542,22 +542,22 @@ calculate_width(int scrw, int wtype, int allign, int margin,
         *panw = scrw;
 
     if (allign != ALLIGN_CENTER) {
-        if (margin > scrw) {
-            ERR( "margin is bigger then edge size %d > %d. Ignoring margin\n",
-                  margin, scrw);
-            margin = 0;
+        if (xmargin > scrw) {
+            ERR( "xmargin is bigger then edge size %d > %d. Ignoring xmargin\n",
+                  xmargin, scrw);
+            xmargin = 0;
         }
         if (wtype == WIDTH_PERCENT)
-            //*panw = MAX(scrw - margin, *panw);
+            //*panw = MAX(scrw - xmargin, *panw);
             ;
         else
-            *panw = MIN(scrw - margin, *panw);
+            *panw = MIN(scrw - xmargin, *panw);
     }
     DBG("OUT panw=%d\n", *panw);
     if (allign == ALLIGN_LEFT)
-        *x += margin;
+        *x += xmargin;
     else if (allign == ALLIGN_RIGHT) {
-        *x += scrw - *panw - margin;
+        *x += scrw - *panw - xmargin;
         if (*x < 0)
             *x = 0;
     } else if (allign == ALLIGN_CENTER)
@@ -588,22 +588,28 @@ calculate_position(panel *np)
     if (np->edge == EDGE_TOP || np->edge == EDGE_BOTTOM) {
         np->aw = np->width;
         np->ax = minx;
-        calculate_width(sswidth, np->widthtype, np->allign, np->margin,
+        calculate_width(sswidth, np->widthtype, np->allign, np->xmargin,
               &np->aw, &np->ax);
         np->ah = np->height;
         np->ah = MIN(PANEL_HEIGHT_MAX, np->ah);
         np->ah = MAX(PANEL_HEIGHT_MIN, np->ah);
-        np->ay = miny + ((np->edge == EDGE_TOP) ? 0 : (ssheight - np->ah));
+        if (np->edge == EDGE_TOP)
+            np->ay = np->ymargin;
+        else
+            np->ay = ssheight - np->ah - np->ymargin;
 
     } else {
         np->ah = np->width;
         np->ay = miny;
-        calculate_width(ssheight, np->widthtype, np->allign, np->margin,
+        calculate_width(ssheight, np->widthtype, np->allign, np->xmargin,
               &np->ah, &np->ay);
         np->aw = np->height;
         np->aw = MIN(PANEL_HEIGHT_MAX, np->aw);
         np->aw = MAX(PANEL_HEIGHT_MIN, np->aw);
-        np->ax = minx + ((np->edge == EDGE_LEFT) ? 0 : (sswidth - np->aw));
+        if (np->edge == EDGE_LEFT)
+            np->ax = np->ymargin;
+        else
+            np->ax = sswidth - np->aw - np->ymargin;
     }
     if (!np->aw)
         np->aw = 1;

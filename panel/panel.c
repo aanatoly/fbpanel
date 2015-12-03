@@ -54,28 +54,28 @@ panel_set_wm_strut(panel *p)
     switch (p->edge) {
     case EDGE_LEFT:
         i = 0;
-        data[i] = p->aw;
+        data[i] = p->aw + p->ymargin;
         data[4 + i*2] = p->ay;
         data[5 + i*2] = p->ay + p->ah;
         if (p->autohide) data[i] = p->height_when_hidden;
         break;
     case EDGE_RIGHT:
         i = 1;
-        data[i] = p->aw;
+        data[i] = p->aw + p->ymargin;
         data[4 + i*2] = p->ay;
         data[5 + i*2] = p->ay + p->ah;
         if (p->autohide) data[i] = p->height_when_hidden;
         break;
     case EDGE_TOP:
         i = 2;
-        data[i] = p->ah;
+        data[i] = p->ah + p->ymargin;
         data[4 + i*2] = p->ax;
         data[5 + i*2] = p->ax + p->aw;
         if (p->autohide) data[i] = p->height_when_hidden;
         break;
     case EDGE_BOTTOM:
         i = 3;
-        data[i] = p->ah;
+        data[i] = p->ah + p->ymargin;
         data[4 + i*2] = p->ax;
         data[5 + i*2] = p->ax + p->aw;
         if (p->autohide) data[i] = p->height_when_hidden;
@@ -657,7 +657,8 @@ panel_parse_global(xconf *xc)
     XCG(xc, "heighttype", &p->heighttype, enum, heighttype_enum);
     XCG(xc, "width", &p->width, int);
     XCG(xc, "height", &p->height, int);
-    XCG(xc, "margin", &p->margin, int);
+    XCG(xc, "xmargin", &p->xmargin, int);
+    XCG(xc, "ymargin", &p->ymargin, int);
 
     /* properties */
     XCG(xc, "setdocktype", &p->setdocktype, enum, bool_enum);

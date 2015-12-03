@@ -1,0 +1,5 @@
+menu.o
+menu.d
+system_menu.o
+system_menu.d
+libmenu.so

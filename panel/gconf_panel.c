@@ -7,7 +7,7 @@
 
 static GtkWidget *dialog;
 static GtkWidget *width_spin, *width_opt;
-static GtkWidget *margin_spin;
+static GtkWidget *xmargin_spin, *ymargin_spin;
 static GtkWidget *allign_opt;
 
 static gconf_block *gl_block;
@@ -182,7 +182,7 @@ geom_changed(gconf_block *b)
     
     ENTER;
     i = gtk_combo_box_get_active(GTK_COMBO_BOX(allign_opt));
-    gtk_widget_set_sensitive(margin_spin, (i != ALLIGN_CENTER));
+    gtk_widget_set_sensitive(xmargin_spin, (i != ALLIGN_CENTER));
     i = gtk_combo_box_get_active(GTK_COMBO_BOX(width_opt));
     gtk_widget_set_sensitive(width_spin, (i != WIDTH_REQUEST));
     if (i == WIDTH_PERCENT)
@@ -237,10 +237,15 @@ mk_geom_block(xconf *xc)
     gconf_block_add(geom_block, w, FALSE);
     allign_opt = w;
     
-    w = gconf_edit_int(geom_block, xconf_get(xc, "margin"), 0, 300);
-    gconf_block_add(geom_block, gtk_label_new(_("Margin")), FALSE);
+    w = gconf_edit_int(geom_block, xconf_get(xc, "xmargin"), 0, 300);
+    gconf_block_add(geom_block, gtk_label_new(_("X Margin")), TRUE);
     gconf_block_add(geom_block, w, FALSE);
-    margin_spin = w;
+    xmargin_spin = w;
+
+    w = gconf_edit_int(geom_block, xconf_get(xc, "ymargin"), 0, 300);
+    gconf_block_add(geom_block, gtk_label_new(_("Y Margin")), FALSE);
+    gconf_block_add(geom_block, w, FALSE);
+    ymargin_spin = w;
 
     gconf_block_add(gl_block, geom_block->main, TRUE);
 

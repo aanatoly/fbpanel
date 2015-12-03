@@ -1,0 +1,9 @@
+egg-marshal.o
+egg-marshal.d
+eggtraymanager.o
+eggtraymanager.d
+fixedtip.o
+fixedtip.d
+main.o
+main.d
+libtray.so
