@@ -657,7 +657,7 @@ panel_parse_global(xconf *xc)
     XCG(xc, "heighttype", &p->heighttype, enum, heighttype_enum);
     XCG(xc, "width", &p->width, int);
     XCG(xc, "height", &p->height, int);
-    XCG(xc, "margin", &p->margin, int);
+    XCG(xc, "xmargin", &p->xmargin, int);
 
     /* properties */
     XCG(xc, "setdocktype", &p->setdocktype, enum, bool_enum);

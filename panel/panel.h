@@ -50,7 +50,7 @@ typedef struct _panel
     
     int ax, ay, aw, ah;  /* prefferd allocation of a panel */
     int cx, cy, cw, ch;  /* current allocation (as reported by configure event) allocation */
-    int allign, edge, margin;
+    int allign, edge, xmargin;
     GtkOrientation orientation;
     int widthtype, width;
     int heighttype, height;
