@@ -1,6 +1,5 @@
 # -*- mode: Makefile -*-
-# Time-stamp: < Makefile-test (2015-12-04 09:40) >
-# author: bubak4@github (aka. martinslouf@users.sourceforge.net)
+# Time-stamp: < Makefile-test (2015-12-04 19:02) >
 
 CC = gcc -Wall -g -O0 `pkg-config --cflags --libs glib-2.0`
 

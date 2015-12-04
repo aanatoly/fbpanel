@@ -123,7 +123,6 @@ static gboolean
 battery_update_os_sys(battery_priv *c)
 {
     ENTER;
-    // author: bubak4@github (aka. martinslouf@users.sourceforge.net)
     c->exist = FALSE;
     power_supply* ps = power_supply_new();
     power_supply_parse(ps);

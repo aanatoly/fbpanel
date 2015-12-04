@@ -1,6 +1,5 @@
-// Time-stamp: < main.c (2015-12-04 09:40) >
+// Time-stamp: < main.c (2015-12-04 19:02) >
 // run with: make -k -f Makefile-test valgrind
-// author: bubak4@github (aka. martinslouf@users.sourceforge.net)
 
 #include <glib-2.0/glib.h>
 #include <glib-2.0/glib/gprintf.h>

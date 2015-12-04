@@ -1,5 +1,4 @@
-// Time-stamp: < power_supply.c (2015-12-04 09:42) >
-// author: bubak4@github (aka. martinslouf@users.sourceforge.net)
+// Time-stamp: < power_supply.c (2015-12-04 19:01) >
 
 #include <string.h>
 #include <glib-2.0/glib.h>
