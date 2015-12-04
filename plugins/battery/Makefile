@@ -2,9 +2,9 @@
 
 TOPDIR := ../..
 
-battery_src = battery.c 
-battery_cflags = -DPLUGIN $(GTK2_CFLAGS) 
-battery_libs = $(GTK2_LIBS) 
-battery_type = lib 
+battery_src = battery.c power_supply.c
+battery_cflags = -DPLUGIN $(GTK2_CFLAGS)
+battery_libs = $(GTK2_LIBS)
+battery_type = lib
 
 include $(TOPDIR)/.config/rules.mk
