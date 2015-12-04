@@ -46,8 +46,8 @@ cpu_get_load_real(struct cpu_stat *cpu)
     stat = fopen("/proc/stat", "r");
     if(!stat)
         return -1;
-    fscanf(stat, "cpu %lu %lu %lu %lu %lu", &cpu->u, &cpu->n, &cpu->s,
-        &cpu->i, &cpu->w);
+    if (fscanf(stat, "cpu %lu %lu %lu %lu %lu", &cpu->u, &cpu->n, &cpu->s,
+            &cpu->i, &cpu->w));
     fclose(stat);
     return 0;
 }

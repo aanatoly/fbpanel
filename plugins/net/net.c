@@ -60,8 +60,8 @@ net_get_load_real(net_priv *c, struct net_stat *net)
     stat = fopen("/proc/net/dev", "r");
     if(!stat)
         return -1;
-    fgets(buf, 256, stat);
-    fgets(buf, 256, stat);
+    if (fgets(buf, 256, stat));
+    if (fgets(buf, 256, stat));
 
     while (!s && !feof(stat) && fgets(buf, 256, stat))
         s = g_strrstr(buf, c->iface);
