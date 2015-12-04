@@ -671,15 +671,19 @@ guint32
 gcolor2rgb24(GdkColor *color)
 {
     guint32 i;
-    guint16 r, g, b;
 
     ENTER;
+#ifdef DEBUGPRN
+    {
+        guint16 r, g, b;
 
-    r = color->red * 0xFF / 0xFFFF;
-    g = color->green * 0xFF / 0xFFFF;
-    b = color->blue * 0xFF / 0xFFFF;
-    DBG("%x %x %x ==> %x %x %x\n", color->red, color->green, color->blue, r, g, b);
-
+        r = color->red * 0xFF / 0xFFFF;
+        g = color->green * 0xFF / 0xFFFF;
+        b = color->blue * 0xFF / 0xFFFF;
+        DBG("%x %x %x ==> %x %x %x\n", color->red, color->green, color->blue,
+            r, g, b);
+    }
+#endif
     i = (color->red * 0xFF / 0xFFFF) & 0xFF;
     i <<= 8;
     i |= (color->green * 0xFF / 0xFFFF) & 0xFF;
