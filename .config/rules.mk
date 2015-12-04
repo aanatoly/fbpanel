@@ -156,9 +156,9 @@ endif
 
 ifeq ($(origin CFLAGS),undefined)
 ifeq ($(origin DEBUG),undefined)
-CFLAGS = -O2 -Wall
+CFLAGS = -O2 -Wall -Werror
 else
-CFLAGS = -O0 -Wall
+CFLAGS = -O0 -Wall -Werror
 endif
 endif
 ifneq ($(origin DEBUG),undefined)

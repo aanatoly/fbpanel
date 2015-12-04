@@ -200,6 +200,14 @@ panel_size_req(GtkWidget *widget, GtkRequisition *req, panel *p)
     RET();
 }
 
+
+static void
+panel_size_alloc (GtkWidget *widget, GdkRectangle *a, gpointer data)
+{
+    DBG("alloc %d %d\n", a->width, a->height);
+}
+
+
 static void
 make_round_corners(panel *p)
 {
@@ -216,6 +224,10 @@ make_round_corners(panel *p)
     if (2*r > MIN(w, h)) {
         r = MIN(w, h) / 2;
         DBG("chaning radius to %d\n", r);
+    }
+    if (r < 4) {
+        DBG("radius too small\n");
+        RET();
     }
     b = gdk_pixmap_new(NULL, w, h, 1);
     gc = gdk_gc_new(GDK_DRAWABLE(b));
@@ -256,7 +268,7 @@ panel_configure_event(GtkWidget *widget, GdkEventConfigure *e, panel *p)
     p->cx = e->x;
     p->cy = e->y;
 
-    /* if panel size is not we have requested, just wait, it will */
+    /* if panel size is not what we have requested, just wait, it will */
     if (e->width != p->aw || e->height != p->ah) {
         DBG("size_req not yet ready. exiting\n");
         RET(FALSE);
@@ -270,22 +282,24 @@ panel_configure_event(GtkWidget *widget, GdkEventConfigure *e, panel *p)
     }
 
     /* panel is at right place, lets go on */
+    DBG("panel is at right place, lets go on\n");
     if (p->transparent) {
-        fb_bg_notify_changed_bg(p->bg);
         DBG("remake bg image\n");
+        fb_bg_notify_changed_bg(p->bg);
     }
     if (p->setstrut) {
-        panel_set_wm_strut(p);
         DBG("set_wm_strut\n");
+        panel_set_wm_strut(p);
     }
     if (p->round_corners) {
-        make_round_corners(p);
         DBG("make_round_corners\n");
+        make_round_corners(p);
+
     }
     gtk_widget_show(p->topgwin);
     if (p->setstrut) {
-        panel_set_wm_strut(p);
         DBG("set_wm_strut\n");
+        panel_set_wm_strut(p);
     }
     RET(FALSE);
 
@@ -544,6 +558,8 @@ panel_start_gui(panel *p)
         (GCallback) panel_destroy_event, p);
     g_signal_connect(G_OBJECT(p->topgwin), "size-request",
         (GCallback) panel_size_req, p);
+    g_signal_connect(G_OBJECT(p->topgwin), "size-allocate",
+        (GCallback) panel_size_alloc, p);
     g_signal_connect(G_OBJECT(p->topgwin), "map-event",
         (GCallback) panel_mapped, p);
     g_signal_connect(G_OBJECT(p->topgwin), "configure-event",
@@ -603,8 +619,8 @@ panel_start_gui(panel *p)
     gtk_box_pack_start(GTK_BOX(p->lbox), p->box, TRUE, TRUE,
         (p->round_corners) ? p->round_corners_radius : 0);
     if (p->round_corners) {
-        make_round_corners(p);
         DBG("make_round_corners\n");
+        make_round_corners(p);
     }
     /* start window creation process */
     gtk_widget_show_all(p->topgwin);
@@ -740,6 +756,15 @@ panel_parse_plugin(xconf *xc)
     p->plugins = g_list_append(p->plugins, plug);
 }
 
+static gboolean
+panel_show_anyway(gpointer data)
+{
+    ENTER;
+    gtk_widget_show_all(p->topgwin);
+    return FALSE;
+}
+
+
 static void
 panel_start(xconf *xc)
 {
@@ -753,6 +778,7 @@ panel_start(xconf *xc)
     panel_parse_global(xconf_find(xc, "global", 0));
     for (i = 0; (pxc = xconf_find(xc, "plugin", i)); i++)
         panel_parse_plugin(pxc);
+    g_timeout_add(200, panel_show_anyway, NULL);
     RET();
 }
 

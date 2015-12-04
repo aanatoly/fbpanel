@@ -707,7 +707,8 @@ pager_bg_changed(FbBg *bg, pager_priv *pg)
 static void
 pager_rebuild_all(FbEv *ev, pager_priv *pg)
 {
-    int desknum, curdesk, dif, i;
+    int desknum, dif, i;
+    int curdesk G_GNUC_UNUSED;
 
     ENTER;
     desknum = pg->desknum;
