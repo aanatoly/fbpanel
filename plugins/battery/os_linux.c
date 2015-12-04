@@ -1,10 +1,10 @@
-
 #include <string.h>
 #include <ctype.h>
 
+#include "power_supply.h"
+
 #define LEN 100
 #define PROC_ACPI "/proc/acpi/battery/"
-
 
 static gboolean
 get_token_eq(gchar *buf, gchar *token, gchar *value, gboolean *ret)
@@ -114,7 +114,7 @@ battery_update_os_proc(battery_priv *c)
     }
     g_dir_close(dir);
 
-out:
+ out:
     g_string_free(path, TRUE);
     RET(ret);
 }
@@ -123,7 +123,18 @@ static gboolean
 battery_update_os_sys(battery_priv *c)
 {
     ENTER;
-    RET(FALSE);
+    c->exist = FALSE;
+    power_supply* ps = power_supply_new();
+    power_supply_parse(ps);
+    if (g_sequence_get_length(ps->bat_list) > 0) {
+        gboolean ac_online = power_supply_is_ac_online(ps);
+        gdouble bat_capacity = power_supply_get_bat_capacity(ps);
+        c->exist = TRUE;
+        c->charging = ac_online;
+        c->level = (gfloat) bat_capacity;
+    }
+    power_supply_free(ps);
+    RET(c->exist);
 }
 
 static gboolean
