@@ -281,6 +281,9 @@ make_button(plugin_instance *p, xconf *xc)
     XCG(xc, "image", &fname, str);
     fname = expand_tilda(fname);
     XCG(xc, "icon", &iname, str);
+    DBG("icon '%s', image '%s'\n", iname, fname);
+    if (!(fname || iname))
+        iname = "text-x-generic";
     if (fname || iname)
     {
         m->bg = fb_button_new(iname, fname, w, h, 0x702020, NULL);

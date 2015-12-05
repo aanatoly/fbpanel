@@ -30,7 +30,6 @@ fetch_gravatar_done(GPid pid, gint status, gpointer data)
 {
     user_priv *c G_GNUC_UNUSED = data;
     plugin_instance *p G_GNUC_UNUSED = data;
-    gchar *image = NULL, *icon = NULL;
 
     ENTER;
     DBG("status %d\n", status);
@@ -41,20 +40,10 @@ fetch_gravatar_done(GPid pid, gint status, gpointer data)
     if (status)
         RET();
     DBG("rebuild menu\n");
-    XCG(p->xc, "icon", &icon, strdup);
-    XCG(p->xc, "image", &image, strdup);
-    XCS(p->xc, "image", image, value);
+    XCS(p->xc, "image", "/tmp/gravatar", value);
     xconf_del(xconf_find(p->xc, "icon", 0), FALSE);
     PLUGIN_CLASS(k)->destructor(p);
     PLUGIN_CLASS(k)->constructor(p);
-    if (image) {
-        XCS(p->xc, "image", image, value);
-        g_free(image);
-    }
-    if (icon) {
-        XCS(p->xc, "icon", icon, value);
-        g_free(icon);
-    }
     RET();
 }
 
@@ -89,17 +78,11 @@ static int
 user_constructor(plugin_instance *p)
 {
     user_priv *c G_GNUC_UNUSED = (user_priv *) p;
-    gchar *image = NULL;
-    gchar *icon = NULL;
     gchar *gravatar = NULL;
 
     ENTER;
     if (!(k = class_get("menu")))
         RET(0);
-    XCG(p->xc, "image", &image, str);
-    XCG(p->xc, "icon", &icon, str);
-    if (!(image || icon))
-        XCS(p->xc, "icon", "avatar-default", value);
     if (!PLUGIN_CLASS(k)->constructor(p))
         RET(0);
     XCG(p->xc, "gravataremail", &gravatar, str);
