@@ -25,7 +25,7 @@ gconf_block_new(GCallback cb, gpointer data, int indent)
         gtk_widget_set_size_request(w, indent, -1);
         gtk_box_pack_start(GTK_BOX(b->main), w, FALSE, FALSE, 0);
     }
-    
+
     /* area */
     w = gtk_vbox_new(FALSE, 2);
     gtk_box_pack_start(GTK_BOX(b->main), w, FALSE, FALSE, 0);
@@ -47,11 +47,11 @@ void
 gconf_block_add(gconf_block *b, GtkWidget *w, gboolean new_row)
 {
     GtkWidget *hbox;
-    
+
     if (!b->rows || new_row)
     {
         GtkWidget *s;
-        
+
         new_row = TRUE;
         hbox = gtk_hbox_new(FALSE, 8);
         b->rows = g_slist_prepend(b->rows, hbox);
@@ -80,7 +80,7 @@ static void
 gconf_edit_int_cb(GtkSpinButton *w, xconf *xc)
 {
     int i;
-    
+
     i = (int) gtk_spin_button_get_value(w);
     xconf_set_int(xc, i);
 }
@@ -112,7 +112,7 @@ static void
 gconf_edit_enum_cb(GtkComboBox *w, xconf *xc)
 {
     int i;
-    
+
     i = gtk_combo_box_get_active(w);
     DBG("%s=%d\n", xc->name, i);
     xconf_set_enum(xc, i, g_object_get_data(G_OBJECT(w), "enum"));
@@ -153,7 +153,7 @@ static void
 gconf_edit_bool_cb(GtkToggleButton *w, xconf *xc)
 {
     int i;
-    
+
     i = gtk_toggle_button_get_active(w);
     DBG("%s=%d\n", xc->name, i);
     xconf_set_enum(xc, i, bool_enum);
@@ -169,7 +169,7 @@ gconf_edit_boolean(gconf_block *b, xconf *xc, gchar *text)
     xconf_set_enum(xc, i, bool_enum);
     w = gtk_check_button_new_with_label(text);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w), i);
-    
+
     g_signal_connect(G_OBJECT(w), "toggled",
         G_CALLBACK(gconf_edit_bool_cb), xc);
     if (b && b->cb)
@@ -190,7 +190,7 @@ gconf_edit_color_cb(GtkColorButton *w, xconf *xc)
 {
     GdkColor c;
     xconf *xc_alpha;
-    
+
     gtk_color_button_get_color(GTK_COLOR_BUTTON(w), &c);
     xconf_set_value(xc, gdk_color_to_RRGGBB(&c));
     if ((xc_alpha = g_object_get_data(G_OBJECT(w), "alpha")))
@@ -204,18 +204,18 @@ gconf_edit_color_cb(GtkColorButton *w, xconf *xc)
 GtkWidget *
 gconf_edit_color(gconf_block *b, xconf *xc_color, xconf *xc_alpha)
 {
-   
+
     GtkWidget *w;
     GdkColor c;
 
     gdk_color_parse(xconf_get_value(xc_color), &c);
-  
+
     w = gtk_color_button_new();
     gtk_color_button_set_color(GTK_COLOR_BUTTON(w), &c);
     if (xc_alpha)
     {
         gint a;
-        
+
         xconf_get_int(xc_alpha, &a);
         a <<= 8; /* scale to 0..FFFF from 0..FF */
         gtk_color_button_set_alpha(GTK_COLOR_BUTTON(w), (guint16) a);
@@ -223,7 +223,7 @@ gconf_edit_color(gconf_block *b, xconf *xc_color, xconf *xc_alpha)
     }
     gtk_color_button_set_use_alpha(GTK_COLOR_BUTTON(w),
         xc_alpha != NULL);
-    
+
     g_signal_connect(G_OBJECT(w), "color-set",
         G_CALLBACK(gconf_edit_color_cb), xc_color);
     if (b && b->cb)

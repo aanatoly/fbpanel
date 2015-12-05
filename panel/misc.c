@@ -426,7 +426,7 @@ get_net_wm_desktop(Window win)
     if (data) {
         desk = *data;
         XFree (data);
-    } else 
+    } else
         DBG("can't get desktop num for win 0x%lx", win);
     RET(desk);
 }
@@ -667,7 +667,7 @@ get_button_spacing(GtkRequisition *req, GtkContainer *parent, gchar *name)
 }
 
 
-guint32 
+guint32
 gcolor2rgb24(GdkColor *color)
 {
     guint32 i;
@@ -783,11 +783,11 @@ indent(int level)
  *   file from @fname
  *   icon named "missing-image" as a fallabck, if @use_fallback is TRUE.
  * Returns pixbuf or NULL on failure
- * 
- * Result pixbuf is always smaller then MAX_SIZE 
+ *
+ * Result pixbuf is always smaller then MAX_SIZE
  */
 GdkPixbuf *
-fb_pixbuf_new(gchar *iname, gchar *fname, int width, int height, 
+fb_pixbuf_new(gchar *iname, gchar *fname, int width, int height,
         gboolean use_fallback)
 {
     GdkPixbuf *pb = NULL;
@@ -807,7 +807,7 @@ fb_pixbuf_new(gchar *iname, gchar *fname, int width, int height,
 }
 
 /* Creates hilighted version of front image to reflect mouse enter
- */ 
+ */
 static GdkPixbuf *
 fb_pixbuf_make_back_image(GdkPixbuf *front, gulong hicolor)
 {
@@ -852,7 +852,7 @@ fb_pixbuf_make_press_image(GdkPixbuf *front)
     tmp = gdk_pixbuf_scale_simple(front, w, h, GDK_INTERP_HYPER);
     if (press && tmp) {
         gdk_pixbuf_fill(press, 0);
-        gdk_pixbuf_copy_area(tmp, 
+        gdk_pixbuf_copy_area(tmp,
                 0, 0,  // src_x, src_y
                 w, h,  // width, height
                 press, // dest_pixbuf
@@ -899,7 +899,7 @@ fb_image_new(gchar *iname, gchar *fname, int width, int height)
 
     image = gtk_image_new();
     conf = g_new0(fb_image_conf_t, 1); /* exits if fails */
-    g_object_set_data(G_OBJECT(image), "conf", conf); 
+    g_object_set_data(G_OBJECT(image), "conf", conf);
     conf->itc_id = g_signal_connect_after (G_OBJECT(icon_theme),
             "changed", (GCallback) fb_image_icon_theme_changed, image);
     g_signal_connect (G_OBJECT(image),
@@ -914,7 +914,7 @@ fb_image_new(gchar *iname, gchar *fname, int width, int height)
     RET(image);
 }
 
-    
+
 /* Frees image's resources
  */
 static void
@@ -929,7 +929,7 @@ fb_image_free(GObject *image)
     g_free(conf->iname);
     g_free(conf->fname);
     for (i = 0; i < PIXBBUF_NUM; i++)
-        if (conf->pix[i]) 
+        if (conf->pix[i])
             g_object_unref(G_OBJECT(conf->pix[i]));
     g_free(conf);
     RET();
@@ -951,7 +951,7 @@ fb_image_icon_theme_changed(GtkIconTheme *icon_theme, GtkWidget *image)
             g_object_unref(G_OBJECT(conf->pix[i]));
 	    conf->pix[i] = NULL;
 	}
-    conf->pix[0] = fb_pixbuf_new(conf->iname, conf->fname, 
+    conf->pix[0] = fb_pixbuf_new(conf->iname, conf->fname,
             conf->width, conf->height, TRUE);
     conf->pix[1] = fb_pixbuf_make_back_image(conf->pix[0], conf->hicolor);
     conf->pix[2] = fb_pixbuf_make_press_image(conf->pix[1]);
@@ -972,7 +972,7 @@ static gboolean fb_button_pressed(GtkWidget *widget, GdkEventButton *event);
  * Additionaly, fb_button highlightes an image on mouse enter and runs simple
  * animation when clicked.
  * FIXME: @label parameter is currently ignored
- */ 
+ */
 GtkWidget *
 fb_button_new(gchar *iname, gchar *fname, int width, int height,
       gulong hicolor, gchar *label)
@@ -1008,7 +1008,7 @@ fb_button_new(gchar *iname, gchar *fname, int width, int height,
 
 /* Flips front and back images upon mouse cross event - GDK_ENTER_NOTIFY
  * or GDK_LEAVE_NOTIFY
- */ 
+ */
 static gboolean
 fb_button_cross(GtkImage *widget, GdkEventCrossing *event)
 {
@@ -1026,7 +1026,7 @@ fb_button_cross(GtkImage *widget, GdkEventCrossing *event)
         conf->i = i;
         gtk_image_set_from_pixbuf(GTK_IMAGE(widget), conf->pix[i]);
     }
-    DBG("%s/%s - %s - pix[%d]=%p\n", conf->iname, conf->fname, 
+    DBG("%s/%s - %s - pix[%d]=%p\n", conf->iname, conf->fname,
 	(event->type == GDK_LEAVE_NOTIFY) ? "out" : "in",
 	conf->i, conf->pix[conf->i]);
     RET(TRUE);
@@ -1044,8 +1044,8 @@ fb_button_pressed(GtkWidget *widget, GdkEventButton *event)
         i = 2;
     } else {
         if ((event->x >=0 && event->x < widget->allocation.width)
-                && (event->y >=0 && event->y < widget->allocation.height)) 
-            i = 1;   
+                && (event->y >=0 && event->y < widget->allocation.height))
+            i = 1;
         else
             i = 0;
     }

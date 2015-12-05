@@ -24,12 +24,12 @@ mk_model(xconf *xc)
     xconf *pxc;
     int i;
     gchar *type;
-    
+
     store = gtk_tree_store_new(N_COLUMNS, G_TYPE_STRING, G_TYPE_STRING);
     for (i = 0; (pxc = xconf_find(xc, "plugin", i)); i++)
     {
         XCG(pxc, "type", &type, str);
-        gtk_tree_store_append(store, &iter, NULL); 
+        gtk_tree_store_append(store, &iter, NULL);
         gtk_tree_store_set (store, &iter,
             TYPE_COL, type,
             NAME_COL, "Martin Heidegger",
@@ -61,7 +61,7 @@ mk_view()
     GtkCellRenderer *renderer;
     GtkTreeViewColumn *column;
     GtkTreeSelection *select;
-    
+
     tree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
     renderer = gtk_cell_renderer_text_new();
     column = gtk_tree_view_column_new_with_attributes("Type",
@@ -81,7 +81,7 @@ mk_buttons()
     GtkWidget *bm, *b, *w;
 
     bm = gtk_hbox_new(FALSE, 3);
-    
+
     w = gtk_button_new_from_stock(GTK_STOCK_ADD);
     gtk_box_pack_start(GTK_BOX(bm), w, FALSE, TRUE, 0);
 
@@ -89,7 +89,7 @@ mk_buttons()
     gtk_box_pack_start(GTK_BOX(bm), b, FALSE, TRUE, 0);
     bbox = b;
     gtk_widget_set_sensitive(bbox, FALSE);
-    
+
     w = gtk_button_new_from_stock(GTK_STOCK_EDIT);
     gtk_box_pack_start(GTK_BOX(b), w, FALSE, TRUE, 0);
     w = gtk_button_new_from_stock(GTK_STOCK_DELETE);
@@ -106,18 +106,18 @@ GtkWidget *
 mk_tab_plugins(xconf *xc)
 {
     GtkWidget *page, *w;
-    
+
     ENTER;
     page = gtk_vbox_new(FALSE, 1);
     gtk_container_set_border_width(GTK_CONTAINER(page), 10);
 
     mk_model(xc);
-    
+
     w = mk_view();
     gtk_box_pack_start(GTK_BOX(page), w, TRUE, TRUE, 0);
     w = mk_buttons();
     gtk_box_pack_start(GTK_BOX(page), w, FALSE, TRUE, 0);
-    
-    gtk_widget_show_all(page);    
+
+    gtk_widget_show_all(page);
     RET(page);
 }

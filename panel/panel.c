@@ -158,8 +158,8 @@ panel_event_filter(GdkXEvent *xevent, GdkEvent *event, panel *p)
             //      XA_CARDINAL, &p->wa_len);
             //print_wmdata(p);
         } else if (at == a_XROOTPMAP_ID) {
-            if (p->transparent) 
-                fb_bg_notify_changed_bg(p->bg);           
+            if (p->transparent)
+                fb_bg_notify_changed_bg(p->bg);
         } else if (at == a_NET_DESKTOP_GEOMETRY) {
             DBG("a_NET_DESKTOP_GEOMETRY\n");
             gtk_main_quit();
@@ -310,8 +310,8 @@ panel_configure_event(GtkWidget *widget, GdkEventConfigure *e, panel *p)
  ****************************************************/
 
 /* Autohide is behaviour when panel hides itself when mouse is "far enough"
- * and pops up again when mouse comes "close enough". 
- * Formally, it's a state machine with 3 states that driven by mouse 
+ * and pops up again when mouse comes "close enough".
+ * Formally, it's a state machine with 3 states that driven by mouse
  * coordinates and timer:
  * 1. VISIBLE - ensures that panel is visible. When/if mouse goes "far enough"
  *      switches to WAITING state
@@ -345,14 +345,14 @@ panel_mapped(GtkWidget *widget, GdkEvent *event, panel *p)
     RET(FALSE);
 }
 
-static gboolean 
+static gboolean
 mouse_watch(panel *p)
 {
     gint x, y;
 
     ENTER;
     gdk_display_get_pointer(gdk_display_get_default(), NULL, &x, &y, NULL);
-    
+
 /*  Reduce sensitivity area
     p->ah_far = ((x < p->cx - GAP) || (x > p->cx + p->cw + GAP)
         || (y < p->cy - GAP) || (y > p->cy + p->ch + GAP));
@@ -467,9 +467,9 @@ about()
     gchar *authors[] = { "Anatoly Asviyan <aanatoly@users.sf.net>", NULL };
 
     ENTER;
-    gtk_show_about_dialog(NULL, 
+    gtk_show_about_dialog(NULL,
         "authors", authors,
-        "comments", "Lightweight GTK+ desktop panel", 
+        "comments", "Lightweight GTK+ desktop panel",
         "license", "GPLv2",
         "program-name", PROJECT_NAME,
         "version", PROJECT_VERSION,
@@ -506,7 +506,7 @@ panel_make_menu(panel *p)
     g_signal_connect(G_OBJECT(mi), "activate",
         (GCallback)about, p);
     gtk_widget_show (mi);
-    
+
     RET(menu);
 }
 
@@ -591,7 +591,7 @@ panel_start_gui(panel *p)
     /* ensure configure event */
     XMoveWindow(GDK_DISPLAY(), p->topxwin, 20, 20);
     XSync(GDK_DISPLAY(), False);
-    
+
     gtk_widget_set_app_paintable(p->topgwin, TRUE);
     calculate_position(p);
     gtk_window_move(GTK_WINDOW(p->topgwin), p->ax, p->ay);
@@ -631,7 +631,7 @@ panel_start_gui(panel *p)
 
     if (p->setstrut)
         panel_set_wm_strut(p);
-    
+
     XSelectInput(GDK_DISPLAY(), GDK_ROOT_WINDOW(), PropertyChangeMask);
     gdk_window_add_filter(gdk_get_default_root_window(),
           (GdkFilterFunc)panel_event_filter, p);
@@ -664,7 +664,7 @@ panel_parse_global(xconf *xc)
     p->spacing = 0;
     p->setlayer = FALSE;
     p->layer = LAYER_ABOVE;
-  
+
     /* Read config */
     /* geometry */
     XCG(xc, "edge", &p->edge, enum, edge_enum);
@@ -683,7 +683,7 @@ panel_parse_global(xconf *xc)
     XCG(xc, "heightwhenhidden", &p->height_when_hidden, int);
     XCG(xc, "setlayer", &p->setlayer, enum, bool_enum);
     XCG(xc, "layer", &p->layer, enum, layer_enum);
-    
+
     /* effects */
     XCG(xc, "roundcorners", &p->round_corners, enum, bool_enum);
     XCG(xc, "roundcornersradius", &p->round_corners_radius, int);
@@ -691,7 +691,7 @@ panel_parse_global(xconf *xc)
     XCG(xc, "alpha", &p->alpha, int);
     XCG(xc, "tintcolor", &p->tintcolor_name, str);
     XCG(xc, "maxelemheight", &p->max_elem_height, int);
-    
+
     /* Sanity checks */
     if (!gdk_color_parse(p->tintcolor_name, &p->gtintcolor))
         gdk_color_parse("white", &p->gtintcolor);
@@ -736,7 +736,7 @@ panel_parse_plugin(xconf *xc)
 {
     plugin_instance *plug = NULL;
     gchar *type = NULL;
-    
+
     ENTER;
     xconf_get_str(xconf_find(xc, "type", 0), &type);
     if (!type || !(plug = plugin_load(type))) {
@@ -770,7 +770,7 @@ panel_start(xconf *xc)
 {
     int i;
     xconf *pxc;
-    
+
     ENTER;
     fbev = fb_ev_new();
 
@@ -796,7 +796,7 @@ panel_stop(panel *p)
 {
     ENTER;
 
-    if (p->autohide) 
+    if (p->autohide)
         ah_stop(p);
     g_list_foreach(p->plugins, delete_plugin, NULL);
     g_list_free(p->plugins);
@@ -867,7 +867,7 @@ static void
 do_argv(int argc, char *argv[])
 {
     int i;
-    
+
     for (i = 1; i < argc; i++) {
         if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
             usage();
