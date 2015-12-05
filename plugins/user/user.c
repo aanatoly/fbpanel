@@ -16,6 +16,7 @@ typedef struct {
     gint dummy;
     guint sid;
     GPid pid;
+    gchar *gravatar_path;
 } user_priv;
 
 static menu_class *k;
@@ -37,10 +38,15 @@ fetch_gravatar_done(GPid pid, gint status, gpointer data)
     c->pid = 0;
     c->sid = 0;
 
-    if (status)
+    if (status) {
+        gchar *gravatar = NULL;
+        XCG(p->xc, "gravataremail", &gravatar, str);
+        ERR("Failed to fetch gravatar for '%s'\n", gravatar);
+        ERR("wget error: %d\n", status);
         RET();
+    }
     DBG("rebuild menu\n");
-    XCS(p->xc, "image", "/tmp/gravatar", value);
+    XCS(p->xc, "image", c->gravatar_path, value);
     xconf_del(xconf_find(p->xc, "icon", 0), FALSE);
     PLUGIN_CLASS(k)->destructor(p);
     PLUGIN_CLASS(k)->constructor(p);
@@ -56,14 +62,15 @@ fetch_gravatar(gpointer data)
     GChecksum *cs;
     gchar *gravatar = NULL;
     gchar buf[GRAVATAR_LEN];
-    // FIXME: select more secure path
-    gchar *image = "/tmp/gravatar";
-    gchar *argv[] = { "wget", "-q", "-O", image, buf, NULL };
+    gchar *argv[] = { "wget", "-q", "-O", NULL, buf, NULL };
 
     ENTER;
     cs = g_checksum_new(G_CHECKSUM_MD5);
     XCG(p->xc, "gravataremail", &gravatar, str);
     g_checksum_update(cs, (guchar *) gravatar, -1);
+    c->gravatar_path = g_strdup_printf("/tmp/gravatar.%s",
+        g_checksum_get_string(cs));
+    argv[3] = c->gravatar_path;
     snprintf(buf, sizeof(buf), "http://www.gravatar.com/avatar/%s",
         g_checksum_get_string(cs));
     g_checksum_free(cs);
@@ -105,6 +112,10 @@ user_destructor(plugin_instance *p)
         kill(c->pid, SIGKILL);
     if (c->sid)
         g_source_remove(c->sid);
+    if (c->gravatar_path) {
+        unlink(c->gravatar_path);
+        g_free(c->gravatar_path);
+    }
     class_put("menu");
     RET();
 }
