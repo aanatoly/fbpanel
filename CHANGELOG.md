@@ -1,6 +1,6 @@
 
 ## Version: develop
-Date: 2015-12-06 00:55:37
+Date: 2015-12-06 00:57:47
 
  * [#14] give gravatar file unique name to avoid collisions with other panels
  * [#11] new plugin: user menu with gravatar icon
