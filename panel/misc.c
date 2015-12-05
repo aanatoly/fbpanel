@@ -705,49 +705,53 @@ gdk_color_to_RRGGBB(GdkColor *color)
 void
 menu_pos(GtkMenu *menu, gint *x, gint *y, gboolean *push_in, GtkWidget *widget)
 {
-    int ox, oy, w, h;
+    int w, h;
 
     ENTER;
-    if (widget) {
-        gdk_window_get_origin(widget->window, &ox, &oy);
-        ox += widget->allocation.x;
-        oy += widget->allocation.y;
-    } else {
-        gdk_display_get_pointer(gdk_display_get_default(), NULL, &ox, &oy, NULL);
-        ox -= 20;
-        if (ox < 0)
-            ox = 0;
-        oy -= 10;
-        if (oy < 0)
-            oy = 0;
-    }
-    w = GTK_WIDGET(menu)->requisition.width;
-    h = GTK_WIDGET(menu)->requisition.height;
-    if (the_panel->orientation == GTK_ORIENTATION_HORIZONTAL) {
-        // x
-        *x = ox;
-        if (*x + w > gdk_screen_width())
-            *x = gdk_screen_width() - w;
-        // y
-        if (the_panel->edge == EDGE_TOP)
-            *y = the_panel->ah;
-        else
-            *y = gdk_screen_height() - the_panel->ah - h;
-    } else {
-        // x
-        if (the_panel->edge == EDGE_LEFT)
-            *x = the_panel->aw;
-        else
-            *x = gdk_screen_width() - the_panel->aw - w;
-        // y
-        *y = oy;
-        if (*y + h > gdk_screen_height())
-            *y = gdk_screen_height() - h;
-    }
-    DBG("w-h %d %d\n", w, h);
     *push_in = TRUE;
+    if (!widget) {
+        gdk_display_get_pointer(gdk_display_get_default(), NULL, x, y, NULL);
+        DBG("mouse pos: x %d, y %d\n", *x, *y);
+        DBG("menu pos: x %d, y %d\n", *x, *y);
+        RET();
+    }
+    DBG("widget: x %d, y %d, w %d, h %d\n",
+        widget->allocation.x,
+        widget->allocation.y,
+        widget->allocation.width,
+        widget->allocation.height);
+    gdk_window_get_origin(widget->window, x, y);
+    DBG("window pos: x %d, y %d\n", *x, *y);
+    DBG("edge: %s\n", num2str(edge_enum, the_panel->edge, "xz"));
+    if (the_panel->edge == EDGE_TOP) {
+        *y += widget->allocation.height;
+        *y += widget->allocation.y;
+        *x += widget->allocation.x;
+    } else if (the_panel->edge == EDGE_LEFT) {
+        *x += widget->allocation.width;
+        *y += widget->allocation.y;
+        *x += widget->allocation.x;
+    } else {
+        w = GTK_WIDGET(menu)->requisition.width;
+        h = GTK_WIDGET(menu)->requisition.height;
+        if (the_panel->edge == EDGE_BOTTOM) {
+            *x += widget->allocation.x;
+            *y += widget->allocation.y;
+            *y -= h;
+            if (*y < 0)
+                *y = 0;
+        } else if (the_panel->edge == EDGE_RIGHT) {
+            *y += widget->allocation.y;
+            *x -= w;
+            *x -= widget->allocation.x;
+            if (*x < 0)
+                *x = 0;
+        }
+    }
+    DBG("menu pos: x %d, y %d\n", *x, *y);
     RET();
 }
+
 
 gchar *
 indent(int level)

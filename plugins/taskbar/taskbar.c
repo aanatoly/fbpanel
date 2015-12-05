@@ -847,10 +847,7 @@ tk_callback_button_release_event(GtkWidget *widget, GdkEventButton *event,
         */
         tk->tb->menutask = tk;
         gtk_menu_popup (GTK_MENU (tk->tb->menu), NULL, NULL,
-            (GtkMenuPositionFunc)menu_pos,
-            tk->tb->plugin.panel->orientation == GTK_ORIENTATION_HORIZONTAL
-            ? NULL : widget,
-            event->button, event->time);
+            (GtkMenuPositionFunc)menu_pos, widget, event->button, event->time);
 
     }
     gtk_button_released(GTK_BUTTON(widget));
