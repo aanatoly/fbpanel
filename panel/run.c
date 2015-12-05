@@ -32,7 +32,7 @@ run_app_argv(gchar **argv)
     GPid pid;
 
     ENTER;
-    // flags |= G_SPAWN_STDOUT_TO_DEV_NULL;
+    flags |= G_SPAWN_STDOUT_TO_DEV_NULL;
     if (!g_spawn_async(NULL, argv, NULL, flags, NULL, NULL, &pid, &error)) {
         GtkWidget *dialog = gtk_message_dialog_new(NULL, 0,
             GTK_MESSAGE_ERROR,
