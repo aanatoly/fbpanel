@@ -8,7 +8,7 @@
 #include <signal.h>
 
 
-#define DEBUGPRN
+//#define DEBUGPRN
 #include "dbg.h"
 
 typedef struct {
