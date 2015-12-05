@@ -359,6 +359,7 @@ menu_destructor(plugin_instance *p)
     g_signal_handlers_disconnect_by_func(G_OBJECT(icon_theme),
         schedule_rebuild_menu, p);
     menu_destroy(m);
+    gtk_widget_destroy(m->bg);
     RET();
 }
 
