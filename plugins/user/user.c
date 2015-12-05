@@ -17,6 +17,7 @@ typedef struct {
     guint sid;
     GPid pid;
     gchar *gravatar_path;
+    int gfd;
 } user_priv;
 
 static menu_class *k;
@@ -68,8 +69,12 @@ fetch_gravatar(gpointer data)
     cs = g_checksum_new(G_CHECKSUM_MD5);
     XCG(p->xc, "gravataremail", &gravatar, str);
     g_checksum_update(cs, (guchar *) gravatar, -1);
-    c->gravatar_path = g_strdup_printf("/tmp/gravatar.%s",
-        g_checksum_get_string(cs));
+    c->gfd = g_file_open_tmp("gravatar.XXXXXX", &c->gravatar_path, NULL);
+    if (c->gfd < 0) {
+        ERR("Can't open tmp gravatar file\n");
+        RET(FALSE);
+    }
+    DBG("tmp file '%s'\n", c->gravatar_path);
     argv[3] = c->gravatar_path;
     snprintf(buf, sizeof(buf), "http://www.gravatar.com/avatar/%s",
         g_checksum_get_string(cs));
@@ -112,6 +117,8 @@ user_destructor(plugin_instance *p)
         kill(c->pid, SIGKILL);
     if (c->sid)
         g_source_remove(c->sid);
+    if (c->gfd > 0)
+        close(c->gfd);
     if (c->gravatar_path) {
         unlink(c->gravatar_path);
         g_free(c->gravatar_path);
