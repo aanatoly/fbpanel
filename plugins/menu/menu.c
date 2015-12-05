@@ -262,21 +262,19 @@ make_button(plugin_instance *p, xconf *xc)
     int w, h;
     menu_priv *m;
     gchar *fname, *iname;
-    int border;
     
     ENTER;
     m = (menu_priv *) p;
-    XCG(xc, "border", &border, int);
     /* XXX: this code is duplicated in every plugin.
      * Lets run it once in a panel */
     if (p->panel->orientation == GTK_ORIENTATION_HORIZONTAL)
     {
         w = -1;
-        h = p->panel->max_elem_height - border;
+        h = p->panel->max_elem_height;
     }
     else
     {
-        w = p->panel->max_elem_height - border;
+        w = p->panel->max_elem_height;
         h = -1;
     }
     fname = iname = NULL;
