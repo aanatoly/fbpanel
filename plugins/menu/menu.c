@@ -11,22 +11,10 @@
 #include "bg.h"
 #include "gtkbgbox.h"
 #include "run.h"
+#include "menu.h"
 
 //#define DEBUGPRN
 #include "dbg.h"
-
-#define MENU_DEFAULT_ICON_SIZE 22
-
-typedef struct {
-    plugin_instance plugin;
-    GtkWidget *menu, *bg;
-    int iconsize, paneliconsize;
-    xconf *xc;
-    guint tout, rtout;
-    gboolean has_system_menu;
-    time_t btime;
-    gint icon_size;
-} menu_priv;
 
 xconf *xconf_new_from_systemmenu();
 gboolean systemmenu_changed(time_t btime);
@@ -371,20 +359,23 @@ menu_destructor(plugin_instance *p)
     g_signal_handlers_disconnect_by_func(G_OBJECT(icon_theme),
         schedule_rebuild_menu, p);
     menu_destroy(m);
+    gtk_widget_destroy(m->bg);
     RET();
 }
 
 
-static plugin_class class = {
-    .count       = 0,
-    .type        = "menu",
-    .name        = "Menu",
-    .version     = "1.0",
-    .description = "Menu",
-    .priv_size   = sizeof(menu_priv),
+static menu_class class = {
+    .plugin = {
+        .count       = 0,
+        .type        = "menu",
+        .name        = "Menu",
+        .version     = "1.0",
+        .description = "Menu",
+        .priv_size   = sizeof(menu_priv),
 
-    .constructor = menu_constructor,
-    .destructor  = menu_destructor,
+        .constructor = menu_constructor,
+        .destructor  = menu_destructor,
+    }
 };
 
 static plugin_class *class_ptr = (plugin_class *) &class;

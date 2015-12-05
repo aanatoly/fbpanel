@@ -196,6 +196,13 @@ void xconf_get_str(xconf *x, gchar **val)
 }
 
 
+void xconf_get_strdup(xconf *x, gchar **val)
+{
+    if (x && x->value)
+        *val = g_strdup(x->value);
+}
+
+
 void xconf_get_int(xconf *x, int *val)
 {
     gchar *s;

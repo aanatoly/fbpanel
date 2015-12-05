@@ -162,7 +162,7 @@ CFLAGS = -O0 -Wall -Werror
 endif
 endif
 ifneq ($(origin DEBUG),undefined)
-override CFLAGS += -g
+override CFLAGS += -g3
 endif
 override CFLAGS += -I$(TOPDIR) $(CFLAGS_EXTRA)
 
@@ -267,7 +267,7 @@ install:
 endef
 
 % : %.in
-	@echo "TEXT    $@"
+	@echo " TEXT   $@"
 	$Q$(TOPDIR)/repl.py < $^ > $@
 
 
