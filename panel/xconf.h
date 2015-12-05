@@ -45,5 +45,8 @@ void xconf_set_enum(xconf *x, int val, xconf_enum *e);
 #define XCG(xc, name, var, type, extra...)                      \
     xconf_get_ ## type(xconf_find(xc, name, 0), var, ## extra)
 
+#define XCS(xc, name, var, type, extra...)                \
+    xconf_set_ ## type(xconf_get(xc, name), var, ## extra)
+
 
 #endif
