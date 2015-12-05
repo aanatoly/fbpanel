@@ -31,7 +31,7 @@ fetch_gravatar_done(GPid pid, gint status, gpointer data)
     user_priv *c G_GNUC_UNUSED = data;
     plugin_instance *p G_GNUC_UNUSED = data;
     // FIXME: select more secure path
-    gchar *image, *icon;
+    gchar *image = NULL, *icon = NULL;
 
     ENTER;
     DBG("status %d\n", status);
