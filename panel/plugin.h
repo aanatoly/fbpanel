@@ -25,14 +25,14 @@ typedef struct {
     char *version;
     char *description;
     int priv_size;
-    
+
     int (*constructor)(struct _plugin_instance *this);
     void (*destructor)(struct _plugin_instance *this);
     void (*save_config)(struct _plugin_instance *this, FILE *fp);
     GtkWidget *(*edit_config)(struct _plugin_instance *this);
 } plugin_class;
 
-#define PLUGIN_CLASS(class) ((plugin_class *) class)    
+#define PLUGIN_CLASS(class) ((plugin_class *) class)
 
 typedef struct _plugin_instance{
     plugin_class *class;
@@ -57,11 +57,11 @@ void class_register(plugin_class *p);
 void class_unregister(plugin_class *p);
 
 #ifdef PLUGIN
-static plugin_class *class_ptr; 
-static void ctor(void) __attribute__ ((constructor)); 
+static plugin_class *class_ptr;
+static void ctor(void) __attribute__ ((constructor));
 static void ctor(void) { class_register(class_ptr); }
-static void dtor(void) __attribute__ ((destructor));  
-static void dtor(void) { class_unregister(class_ptr); }   
+static void dtor(void) __attribute__ ((destructor));
+static void dtor(void) { class_unregister(class_ptr); }
 #endif
 
 #endif

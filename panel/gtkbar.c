@@ -21,7 +21,7 @@
  * Modified by the GTK+ Team and others 1997-2000.  See the AUTHORS
  * file for a list of people on the GTK+ Team.  See the ChangeLog
  * files for a list of changes.  These files are distributed with
- * GTK+ at ftp://ftp.gtk.org/pub/gtk/. 
+ * GTK+ at ftp://ftp.gtk.org/pub/gtk/.
  */
 
 #include "gtkbar.h"
@@ -119,7 +119,7 @@ gtk_bar_size_request(GtkWidget *widget, GtkRequisition *requisition)
     GtkBoxChild *child;
     GList *children;
     gint nvis_children, rows, cols, dim;
-    
+
     nvis_children = 0;
     children = box->children;
     while (children) {
@@ -128,9 +128,9 @@ gtk_bar_size_request(GtkWidget *widget, GtkRequisition *requisition)
 
         if (GTK_WIDGET_VISIBLE(child->widget))	{
             GtkRequisition child_requisition;
-            
+
             /* Do not remove child request !!! Label's proper layout depends
-             * on request running before alloc. */ 
+             * on request running before alloc. */
             gtk_widget_size_request(child->widget, &child_requisition);
             nvis_children++;
         }
@@ -149,7 +149,7 @@ gtk_bar_size_request(GtkWidget *widget, GtkRequisition *requisition)
         cols = dim;
         rows = (gint) ceilf((float) nvis_children / cols);
     }
-    
+
     requisition->width = bar->child_width * cols
         + box->spacing * (cols - 1);
     requisition->height = bar->child_height * rows
@@ -178,7 +178,7 @@ gtk_bar_size_allocate(GtkWidget *widget, GtkAllocation *allocation)
     while (children) {
         child = children->data;
         children = children->next;
-        
+
         if (GTK_WIDGET_VISIBLE (child->widget))
             nvis_children += 1;
     }
@@ -206,7 +206,7 @@ gtk_bar_size_allocate(GtkWidget *widget, GtkAllocation *allocation)
     DBG("child alloc: width=%d height=%d\n",
         child_allocation.width,
         child_allocation.height);
-        
+
     child_allocation.x = allocation->x;
     child_allocation.y = allocation->y;
     children = box->children;
@@ -214,7 +214,7 @@ gtk_bar_size_allocate(GtkWidget *widget, GtkAllocation *allocation)
     while (children) {
         child = children->data;
         children = children->next;
-        
+
         if (GTK_WIDGET_VISIBLE (child->widget)) {
             DBG("allocate x=%d y=%d\n", child_allocation.x,
                 child_allocation.y);
@@ -241,7 +241,7 @@ gtk_bar_expose (GtkWidget *widget, GdkEventExpose *event)
 
     if (GTK_WIDGET_DRAWABLE (widget)) {
         int w, h;
-        
+
         DBG("w, h = %d,%d\n", w, h);
         if (!GTK_WIDGET_APP_PAINTABLE (widget))
             gtk_paint_flat_box (widget->style, widget->window,

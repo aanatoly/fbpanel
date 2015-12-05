@@ -59,7 +59,7 @@ struct _FbEv {
     Window active_window;
     Window *client_list;
     Window *client_list_stacking;
-    
+
     Window   xroot;
     Atom     id;
     GC       gc;
@@ -113,7 +113,7 @@ fb_ev_class_init (FbEvClass *klass)
 {
     GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-    signals [EV_CURRENT_DESKTOP] = 
+    signals [EV_CURRENT_DESKTOP] =
         g_signal_new ("current_desktop",
               G_OBJECT_CLASS_TYPE (object_class),
               G_SIGNAL_RUN_FIRST,
@@ -121,7 +121,7 @@ fb_ev_class_init (FbEvClass *klass)
               NULL, NULL,
               g_cclosure_marshal_VOID__VOID,
               G_TYPE_NONE, 0);
-    signals [EV_NUMBER_OF_DESKTOPS] = 
+    signals [EV_NUMBER_OF_DESKTOPS] =
         g_signal_new ("number_of_desktops",
               G_OBJECT_CLASS_TYPE (object_class),
               G_SIGNAL_RUN_FIRST,
@@ -129,7 +129,7 @@ fb_ev_class_init (FbEvClass *klass)
               NULL, NULL,
               g_cclosure_marshal_VOID__VOID,
               G_TYPE_NONE, 0);
-    signals [EV_DESKTOP_NAMES] = 
+    signals [EV_DESKTOP_NAMES] =
         g_signal_new ("desktop_names",
               G_OBJECT_CLASS_TYPE (object_class),
               G_SIGNAL_RUN_FIRST,
@@ -137,7 +137,7 @@ fb_ev_class_init (FbEvClass *klass)
               NULL, NULL,
               g_cclosure_marshal_VOID__VOID,
               G_TYPE_NONE, 0);
-    signals [EV_ACTIVE_WINDOW] = 
+    signals [EV_ACTIVE_WINDOW] =
         g_signal_new ("active_window",
               G_OBJECT_CLASS_TYPE (object_class),
               G_SIGNAL_RUN_FIRST,
@@ -145,7 +145,7 @@ fb_ev_class_init (FbEvClass *klass)
               NULL, NULL,
               g_cclosure_marshal_VOID__VOID,
               G_TYPE_NONE, 0);
-    signals [EV_CLIENT_LIST_STACKING] = 
+    signals [EV_CLIENT_LIST_STACKING] =
         g_signal_new ("client_list_stacking",
               G_OBJECT_CLASS_TYPE (object_class),
               G_SIGNAL_RUN_FIRST,
@@ -153,7 +153,7 @@ fb_ev_class_init (FbEvClass *klass)
               NULL, NULL,
               g_cclosure_marshal_VOID__VOID,
               G_TYPE_NONE, 0);
-    signals [EV_CLIENT_LIST] = 
+    signals [EV_CLIENT_LIST] =
         g_signal_new ("client_list",
               G_OBJECT_CLASS_TYPE (object_class),
               G_SIGNAL_RUN_FIRST,
@@ -191,7 +191,7 @@ fb_ev_new()
 static void
 fb_ev_finalize (GObject *object)
 {
-    FbEv *ev;
+    FbEv *ev G_GNUC_UNUSED;
 
     ev = FB_EV (object);
     //XFreeGC(ev->dpy, ev->gc);
@@ -274,11 +274,11 @@ fb_ev_current_desktop(FbEv *ev)
             ev->current_desktop = *data;
             XFree (data);
         } else
-            ev->current_desktop = 0;              
+            ev->current_desktop = 0;
     }
     RET(ev->current_desktop);
 }
-        
+
 int
 fb_ev_number_of_desktops(FbEv *ev)
 {
@@ -291,7 +291,7 @@ fb_ev_number_of_desktops(FbEv *ev)
             ev->number_of_desktops = *data;
             XFree (data);
         } else
-            ev->number_of_desktops = 0;              
+            ev->number_of_desktops = 0;
     }
     RET(ev->number_of_desktops);
 

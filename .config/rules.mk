@@ -38,7 +38,7 @@ SPACE := $(EMPTY) $(EMPTY)
 #  recurion rules                             #
 ###############################################
 
-RGOALS = all clean install svnignore
+RGOALS = all clean install svnignore gitignore
 .PHONY : $(RGOALS) $(SUBDIRS)
 $(RGOALS) : $(SUBDIRS)
 
@@ -155,10 +155,14 @@ endif
 endif
 
 ifeq ($(origin CFLAGS),undefined)
-CFLAGS = -O2
+ifeq ($(origin DEBUG),undefined)
+CFLAGS = -O2 -Wall -Werror
+else
+CFLAGS = -O0 -Wall -Werror
+endif
 endif
 ifneq ($(origin DEBUG),undefined)
-override CFLAGS += -g
+override CFLAGS += -g3
 endif
 override CFLAGS += -I$(TOPDIR) $(CFLAGS_EXTRA)
 
@@ -263,7 +267,7 @@ install:
 endef
 
 % : %.in
-	@echo "TEXT    $@"
+	@echo " TEXT   $@"
 	$Q$(TOPDIR)/repl.py < $^ > $@
 
 
@@ -285,7 +289,7 @@ endif
 
 clean:
 ifneq (,$(CLEANLIST))
-	$(call summary,CLEAN  ,)
+	$(call summary,CLEAN ,)
 	$Qrm -rf $(CLEANLIST)
 endif
 
@@ -323,4 +327,12 @@ svnignore:
 	cat $$prop; \
 	svn propset svn:ignore --file $$prop .; \
 	rm -f $$prop
+
+help_target ::
+	@echo "gitignore - tell git to ignore files in a cleanlist"
+
+gitignore:
+	$Qfor i in $(DISTCLEANLIST) $(CLEANLIST); do echo "$$i"; \
+		done > .gitignore
+	$Qgit add .gitignore
 

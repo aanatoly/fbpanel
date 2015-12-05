@@ -5,7 +5,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: fbpanel 6.2\n"
+"Project-Id-Version: fbpanel 7.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-09-30 02:02+0200\n"
 "PO-Revision-Date: 2010-09-30 02:02+0200\n"

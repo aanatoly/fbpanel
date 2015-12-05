@@ -54,28 +54,28 @@ panel_set_wm_strut(panel *p)
     switch (p->edge) {
     case EDGE_LEFT:
         i = 0;
-        data[i] = p->aw;
+        data[i] = p->aw + p->ymargin;
         data[4 + i*2] = p->ay;
         data[5 + i*2] = p->ay + p->ah;
         if (p->autohide) data[i] = p->height_when_hidden;
         break;
     case EDGE_RIGHT:
         i = 1;
-        data[i] = p->aw;
+        data[i] = p->aw + p->ymargin;
         data[4 + i*2] = p->ay;
         data[5 + i*2] = p->ay + p->ah;
         if (p->autohide) data[i] = p->height_when_hidden;
         break;
     case EDGE_TOP:
         i = 2;
-        data[i] = p->ah;
+        data[i] = p->ah + p->ymargin;
         data[4 + i*2] = p->ax;
         data[5 + i*2] = p->ax + p->aw;
         if (p->autohide) data[i] = p->height_when_hidden;
         break;
     case EDGE_BOTTOM:
         i = 3;
-        data[i] = p->ah;
+        data[i] = p->ah + p->ymargin;
         data[4 + i*2] = p->ax;
         data[5 + i*2] = p->ax + p->aw;
         if (p->autohide) data[i] = p->height_when_hidden;
@@ -158,8 +158,8 @@ panel_event_filter(GdkXEvent *xevent, GdkEvent *event, panel *p)
             //      XA_CARDINAL, &p->wa_len);
             //print_wmdata(p);
         } else if (at == a_XROOTPMAP_ID) {
-            if (p->transparent) 
-                fb_bg_notify_changed_bg(p->bg);           
+            if (p->transparent)
+                fb_bg_notify_changed_bg(p->bg);
         } else if (at == a_NET_DESKTOP_GEOMETRY) {
             DBG("a_NET_DESKTOP_GEOMETRY\n");
             gtk_main_quit();
@@ -200,6 +200,14 @@ panel_size_req(GtkWidget *widget, GtkRequisition *req, panel *p)
     RET();
 }
 
+
+static void
+panel_size_alloc (GtkWidget *widget, GdkRectangle *a, gpointer data)
+{
+    DBG("alloc %d %d\n", a->width, a->height);
+}
+
+
 static void
 make_round_corners(panel *p)
 {
@@ -216,6 +224,10 @@ make_round_corners(panel *p)
     if (2*r > MIN(w, h)) {
         r = MIN(w, h) / 2;
         DBG("chaning radius to %d\n", r);
+    }
+    if (r < 4) {
+        DBG("radius too small\n");
+        RET();
     }
     b = gdk_pixmap_new(NULL, w, h, 1);
     gc = gdk_gc_new(GDK_DRAWABLE(b));
@@ -256,7 +268,7 @@ panel_configure_event(GtkWidget *widget, GdkEventConfigure *e, panel *p)
     p->cx = e->x;
     p->cy = e->y;
 
-    /* if panel size is not we have requested, just wait, it will */
+    /* if panel size is not what we have requested, just wait, it will */
     if (e->width != p->aw || e->height != p->ah) {
         DBG("size_req not yet ready. exiting\n");
         RET(FALSE);
@@ -270,22 +282,24 @@ panel_configure_event(GtkWidget *widget, GdkEventConfigure *e, panel *p)
     }
 
     /* panel is at right place, lets go on */
+    DBG("panel is at right place, lets go on\n");
     if (p->transparent) {
-        fb_bg_notify_changed_bg(p->bg);
         DBG("remake bg image\n");
+        fb_bg_notify_changed_bg(p->bg);
     }
     if (p->setstrut) {
-        panel_set_wm_strut(p);
         DBG("set_wm_strut\n");
+        panel_set_wm_strut(p);
     }
     if (p->round_corners) {
-        make_round_corners(p);
         DBG("make_round_corners\n");
+        make_round_corners(p);
+
     }
     gtk_widget_show(p->topgwin);
     if (p->setstrut) {
-        panel_set_wm_strut(p);
         DBG("set_wm_strut\n");
+        panel_set_wm_strut(p);
     }
     RET(FALSE);
 
@@ -296,8 +310,8 @@ panel_configure_event(GtkWidget *widget, GdkEventConfigure *e, panel *p)
  ****************************************************/
 
 /* Autohide is behaviour when panel hides itself when mouse is "far enough"
- * and pops up again when mouse comes "close enough". 
- * Formally, it's a state machine with 3 states that driven by mouse 
+ * and pops up again when mouse comes "close enough".
+ * Formally, it's a state machine with 3 states that driven by mouse
  * coordinates and timer:
  * 1. VISIBLE - ensures that panel is visible. When/if mouse goes "far enough"
  *      switches to WAITING state
@@ -331,14 +345,14 @@ panel_mapped(GtkWidget *widget, GdkEvent *event, panel *p)
     RET(FALSE);
 }
 
-static gboolean 
+static gboolean
 mouse_watch(panel *p)
 {
     gint x, y;
 
     ENTER;
     gdk_display_get_pointer(gdk_display_get_default(), NULL, &x, &y, NULL);
-    
+
 /*  Reduce sensitivity area
     p->ah_far = ((x < p->cx - GAP) || (x > p->cx + p->cw + GAP)
         || (y < p->cy - GAP) || (y > p->cy + p->ch + GAP));
@@ -453,9 +467,9 @@ about()
     gchar *authors[] = { "Anatoly Asviyan <aanatoly@users.sf.net>", NULL };
 
     ENTER;
-    gtk_show_about_dialog(NULL, 
+    gtk_show_about_dialog(NULL,
         "authors", authors,
-        "comments", "Lightweight GTK+ desktop panel", 
+        "comments", "Lightweight GTK+ desktop panel",
         "license", "GPLv2",
         "program-name", PROJECT_NAME,
         "version", PROJECT_VERSION,
@@ -492,7 +506,7 @@ panel_make_menu(panel *p)
     g_signal_connect(G_OBJECT(mi), "activate",
         (GCallback)about, p);
     gtk_widget_show (mi);
-    
+
     RET(menu);
 }
 
@@ -544,6 +558,8 @@ panel_start_gui(panel *p)
         (GCallback) panel_destroy_event, p);
     g_signal_connect(G_OBJECT(p->topgwin), "size-request",
         (GCallback) panel_size_req, p);
+    g_signal_connect(G_OBJECT(p->topgwin), "size-allocate",
+        (GCallback) panel_size_alloc, p);
     g_signal_connect(G_OBJECT(p->topgwin), "map-event",
         (GCallback) panel_mapped, p);
     g_signal_connect(G_OBJECT(p->topgwin), "configure-event",
@@ -575,7 +591,7 @@ panel_start_gui(panel *p)
     /* ensure configure event */
     XMoveWindow(GDK_DISPLAY(), p->topxwin, 20, 20);
     XSync(GDK_DISPLAY(), False);
-    
+
     gtk_widget_set_app_paintable(p->topgwin, TRUE);
     calculate_position(p);
     gtk_window_move(GTK_WINDOW(p->topgwin), p->ax, p->ay);
@@ -603,8 +619,8 @@ panel_start_gui(panel *p)
     gtk_box_pack_start(GTK_BOX(p->lbox), p->box, TRUE, TRUE,
         (p->round_corners) ? p->round_corners_radius : 0);
     if (p->round_corners) {
-        make_round_corners(p);
         DBG("make_round_corners\n");
+        make_round_corners(p);
     }
     /* start window creation process */
     gtk_widget_show_all(p->topgwin);
@@ -615,7 +631,7 @@ panel_start_gui(panel *p)
 
     if (p->setstrut)
         panel_set_wm_strut(p);
-    
+
     XSelectInput(GDK_DISPLAY(), GDK_ROOT_WINDOW(), PropertyChangeMask);
     gdk_window_add_filter(gdk_get_default_root_window(),
           (GdkFilterFunc)panel_event_filter, p);
@@ -648,7 +664,7 @@ panel_parse_global(xconf *xc)
     p->spacing = 0;
     p->setlayer = FALSE;
     p->layer = LAYER_ABOVE;
-  
+
     /* Read config */
     /* geometry */
     XCG(xc, "edge", &p->edge, enum, edge_enum);
@@ -657,7 +673,8 @@ panel_parse_global(xconf *xc)
     XCG(xc, "heighttype", &p->heighttype, enum, heighttype_enum);
     XCG(xc, "width", &p->width, int);
     XCG(xc, "height", &p->height, int);
-    XCG(xc, "margin", &p->margin, int);
+    XCG(xc, "xmargin", &p->xmargin, int);
+    XCG(xc, "ymargin", &p->ymargin, int);
 
     /* properties */
     XCG(xc, "setdocktype", &p->setdocktype, enum, bool_enum);
@@ -666,7 +683,7 @@ panel_parse_global(xconf *xc)
     XCG(xc, "heightwhenhidden", &p->height_when_hidden, int);
     XCG(xc, "setlayer", &p->setlayer, enum, bool_enum);
     XCG(xc, "layer", &p->layer, enum, layer_enum);
-    
+
     /* effects */
     XCG(xc, "roundcorners", &p->round_corners, enum, bool_enum);
     XCG(xc, "roundcornersradius", &p->round_corners_radius, int);
@@ -674,7 +691,7 @@ panel_parse_global(xconf *xc)
     XCG(xc, "alpha", &p->alpha, int);
     XCG(xc, "tintcolor", &p->tintcolor_name, str);
     XCG(xc, "maxelemheight", &p->max_elem_height, int);
-    
+
     /* Sanity checks */
     if (!gdk_color_parse(p->tintcolor_name, &p->gtintcolor))
         gdk_color_parse("white", &p->gtintcolor);
@@ -719,7 +736,7 @@ panel_parse_plugin(xconf *xc)
 {
     plugin_instance *plug = NULL;
     gchar *type = NULL;
-    
+
     ENTER;
     xconf_get_str(xconf_find(xc, "type", 0), &type);
     if (!type || !(plug = plugin_load(type))) {
@@ -739,12 +756,21 @@ panel_parse_plugin(xconf *xc)
     p->plugins = g_list_append(p->plugins, plug);
 }
 
+static gboolean
+panel_show_anyway(gpointer data)
+{
+    ENTER;
+    gtk_widget_show_all(p->topgwin);
+    return FALSE;
+}
+
+
 static void
 panel_start(xconf *xc)
 {
     int i;
     xconf *pxc;
-    
+
     ENTER;
     fbev = fb_ev_new();
 
@@ -752,6 +778,7 @@ panel_start(xconf *xc)
     panel_parse_global(xconf_find(xc, "global", 0));
     for (i = 0; (pxc = xconf_find(xc, "plugin", i)); i++)
         panel_parse_plugin(pxc);
+    g_timeout_add(200, panel_show_anyway, NULL);
     RET();
 }
 
@@ -769,7 +796,7 @@ panel_stop(panel *p)
 {
     ENTER;
 
-    if (p->autohide) 
+    if (p->autohide)
         ah_stop(p);
     g_list_foreach(p->plugins, delete_plugin, NULL);
     g_list_free(p->plugins);
@@ -840,7 +867,7 @@ static void
 do_argv(int argc, char *argv[])
 {
     int i;
-    
+
     for (i = 1; i < argc; i++) {
         if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
             usage();

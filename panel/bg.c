@@ -101,7 +101,7 @@ fb_bg_class_init (FbBgClass *klass)
 {
     GObjectClass *object_class = G_OBJECT_CLASS (klass);
     ENTER;
-    signals [CHANGED] = 
+    signals [CHANGED] =
         g_signal_new ("changed",
               G_OBJECT_CLASS_TYPE (object_class),
               G_SIGNAL_RUN_FIRST,
@@ -154,7 +154,7 @@ fb_bg_finalize (GObject *object)
     bg = FB_BG (object);
     XFreeGC(bg->dpy, bg->gc);
     default_bg = NULL;
-    
+
     RET();
 }
 
@@ -190,7 +190,7 @@ fb_bg_get_xrootpmap_real(FbBg *bg)
                     ret = *((Pixmap *)prop);
                     c = -c ; //to quit loop
                 }
-                XFree(prop);           
+                XFree(prop);
             }
         } while (--c > 0);
     }
@@ -206,7 +206,7 @@ fb_bg_get_xroot_pix_for_area(FbBg *bg, gint x, gint y,
 {
     GdkPixmap *gbgpix;
     Pixmap bgpix;
-    
+
     ENTER;
     if (bg->pixmap == None)
         RET(NULL);
@@ -235,7 +235,7 @@ fb_bg_get_xroot_pix_for_win(FbBg *bg, GtkWidget *widget)
     if (bg->pixmap == None)
         RET(NULL);
 
-    win = GDK_WINDOW_XWINDOW(widget->window); 
+    win = GDK_WINDOW_XWINDOW(widget->window);
     if (!XGetGeometry(bg->dpy, win, &dummy, &x, &y, &width, &height, &border,
               &depth)) {
         DBG2("XGetGeometry failed\n");
@@ -263,7 +263,7 @@ fb_bg_composite(GdkDrawable *base, GdkGC *gc, guint32 tintcolor, gint alpha)
     GdkPixbuf *ret, *ret2;
     int w, h;
     static GdkColormap *cmap = NULL;
-    
+
     ENTER;
     gdk_drawable_get_size (base, &w, &h);
     if (!cmap) {
@@ -274,7 +274,7 @@ fb_bg_composite(GdkDrawable *base, GdkGC *gc, guint32 tintcolor, gint alpha)
     if (!ret)
         RET();
     DBG("here w=%d h=%d\n", w, h);
-    ret2 = gdk_pixbuf_composite_color_simple(ret, w, h, 
+    ret2 = gdk_pixbuf_composite_color_simple(ret, w, h,
           GDK_INTERP_HYPER, 255-alpha, MIN(w, h), tintcolor, tintcolor);
     DBG("here\n");
     if (!ret2) {
@@ -297,7 +297,7 @@ fb_bg_changed(FbBg *bg)
     bg->pixmap = fb_bg_get_xrootpmap_real(bg);
     if (bg->pixmap != None) {
         XGCValues  gcv;
-        
+
         gcv.tile = bg->pixmap;
         XChangeGC(bg->dpy, bg->gc, GCTile, &gcv);
         DBG("changed\n");

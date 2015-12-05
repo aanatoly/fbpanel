@@ -1,0 +1,5 @@
+battery.o
+battery.d
+power_supply.o
+power_supply.d
+libbattery.so

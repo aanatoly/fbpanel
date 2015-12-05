@@ -36,7 +36,7 @@ void xconf_append_sons(xconf *dst, xconf *src)
 {
     GSList *e;
     xconf *tmp;
-    
+
     if (!dst || !src)
         return;
     for (e = src->sons; e; e = g_slist_next(e))
@@ -74,7 +74,7 @@ void xconf_del(xconf *x, gboolean sons_only)
 {
     GSList *s;
     xconf *x2;
-    
+
     if (!x)
         return;
     DBG("%s %s\n", x->name, x->value);
@@ -99,7 +99,7 @@ void xconf_set_value(xconf *x, gchar *value)
     xconf_del(x, TRUE);
     g_free(x->value);
     x->value = g_strdup(value);
-  
+
 }
 
 void xconf_set_value_ref(xconf *x, gchar *value)
@@ -107,7 +107,7 @@ void xconf_set_value_ref(xconf *x, gchar *value)
     xconf_del(x, TRUE);
     g_free(x->value);
     x->value = value;
-  
+
 }
 
 void xconf_set_int(xconf *x, int i)
@@ -193,6 +193,13 @@ void xconf_get_str(xconf *x, gchar **val)
 {
     if (x && x->value)
         *val = x->value;
+}
+
+
+void xconf_get_strdup(xconf *x, gchar **val)
+{
+    if (x && x->value)
+        *val = g_strdup(x->value);
 }
 
 
@@ -368,15 +375,15 @@ gboolean
 xconf_cmp(xconf *a, xconf *b)
 {
     GSList *as, *bs;
-    
+
     if (!(a || b))
         return FALSE;
     if (!(a && b))
         return TRUE;
-    
+
     if (g_ascii_strcasecmp(a->name, b->name))
         return TRUE;
-    
+
     if (g_strcmp0(a->value, b->value))
         return TRUE;
     for (as = a->sons, bs = b->sons; as && bs;
