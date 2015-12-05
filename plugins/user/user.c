@@ -31,7 +31,7 @@ fetch_gravatar_done(GPid pid, gint status, gpointer data)
     user_priv *c G_GNUC_UNUSED = data;
     plugin_instance *p G_GNUC_UNUSED = data;
     // FIXME: select more secure path
-    gchar *image = "/tmp/gravatar";
+    gchar *image, *icon;
 
     ENTER;
     DBG("status %d\n", status);
@@ -39,13 +39,22 @@ fetch_gravatar_done(GPid pid, gint status, gpointer data)
     c->pid = 0;
     c->sid = 0;
 
-    if (!status) {
-        DBG("rebuild menu\n");
+    if (status)
+        RET();
+    DBG("rebuild menu\n");
+    XCG(p->xc, "icon", &icon, strdup);
+    XCG(p->xc, "image", &image, strdup);
+    XCS(p->xc, "image", image, value);
+    xconf_del(xconf_find(p->xc, "icon", 0), FALSE);
+    PLUGIN_CLASS(k)->destructor(p);
+    PLUGIN_CLASS(k)->constructor(p);
+    if (image) {
         XCS(p->xc, "image", image, value);
-        // FIXME: should we unset "icon"?
-        XCS(p->xc, "icon", NULL, value);
-        PLUGIN_CLASS(k)->destructor(p);
-        PLUGIN_CLASS(k)->constructor(p);
+        g_free(image);
+    }
+    if (icon) {
+        XCS(p->xc, "icon", icon, value);
+        g_free(icon);
     }
     RET();
 }
@@ -61,7 +70,7 @@ fetch_gravatar(gpointer data)
     gchar buf[GRAVATAR_LEN];
     // FIXME: select more secure path
     gchar *image = "/tmp/gravatar";
-    gchar *argv[] = { "wget", "-O", image, buf, NULL };
+    gchar *argv[] = { "wget", "-q", "-O", image, buf, NULL };
 
     ENTER;
     cs = g_checksum_new(G_CHECKSUM_MD5);
@@ -88,8 +97,6 @@ user_constructor(plugin_instance *p)
     ENTER;
     if (!(k = class_get("menu")))
         RET(0);
-    // FIXME: if `gravatar` is set, download it and set `image`
-    // ...
     XCG(p->xc, "image", &image, str);
     XCG(p->xc, "icon", &icon, str);
     if (!(image || icon))
