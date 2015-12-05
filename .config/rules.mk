@@ -267,7 +267,7 @@ install:
 endef
 
 % : %.in
-	@echo "TEXT    $@"
+	@echo " TEXT   $@"
 	$Q$(TOPDIR)/repl.py < $^ > $@
 
 
