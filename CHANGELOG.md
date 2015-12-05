@@ -1,6 +1,13 @@
 
+## Version: develop
+Date: 2015-12-06 00:01:20
+
+ * [#11] new plugin: user menu with gravatar icon
+
+[#11]: https://github.com/aanatoly/fbpanel/issues/11
+
 ## Version: 7.0
-Date: 2015-12-05 08:25:36
+Date: 2015-12-05 08:34:21
 
  * [#12] fix menu position for top panel
  * [#11] new plugin: user menu with gravatar icon
