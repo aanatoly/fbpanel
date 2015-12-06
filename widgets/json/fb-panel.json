@@ -1,0 +1,150 @@
+{
+    "type" : "GObject",
+    "name" : "fb:panel",
+    "parent" : "gtk:window",
+    "copyright" : "Copyright 2015 by anatoly@fgmail.com",
+    "licence" : "GPLv2",
+
+    "h-includes": [
+        "#include <X11/Xlib.h>",
+        "#include <gtk/gtk.h>",
+        "#include <gdk/gdk.h>"
+    ],
+
+    "c-includes": [
+        "",
+        "//#define DEBUGPRN",
+        "#include \"dbg.h\""
+    ],
+
+    "instance-variables": [
+        {
+            "type": "GVarObject",
+            "name": "layout",
+            "gname": "GtkWidget"
+        },
+        {
+            "type": "GVarObject",
+            "name": "bg_box",
+            "gname": "GtkWidget"
+        },
+        {
+            "type": "GVarObject",
+            "name": "plugins_box",
+            "gname": "GtkWidget"
+        },
+        {
+            "type": "GVarObject",
+            "name": "menu",
+            "gname": "GtkWidget"
+        }
+    ],
+
+    "properties": [
+        {
+            "type": "GPropString",
+            "name": "profile",
+            "access": ["readwrite", "construct-only"]
+        },
+        {
+            "type": "GPropEnum",
+            "name": "align",
+            "gname": "fb:align",
+            "default": "center"
+        },
+        {
+            "type": "GPropEnum",
+            "name": "edge",
+            "gname": "fb:edge",
+            "default": "bottom"
+        },
+        {
+            "type": "GPropEnum",
+            "name": "width_type",
+            "gname": "fb:width",
+            "default": "precent"
+        },
+        {
+            "type": "GPropInt",
+            "name": "width",
+            "min_": 1,
+            "max_": 3000,
+            "default": "80"
+        },
+        {
+            "type": "GPropInt",
+            "name": "height",
+            "min_": 1,
+            "max_": 3000,
+            "default": "80"
+        }
+    ],
+
+    "methods": [
+        {
+            "name": "constructed",
+            "parent": "g:object",
+            "ret": "void",
+            "args": []
+        },
+        {
+            "name": "size_request",
+            "parent": "gtk:widget",
+            "ret": "void",
+            "args": [
+                ["requisition", "GtkRequisition *"]
+            ]
+        },
+        {
+            "name": "size_allocate",
+            "parent": "gtk:widget",
+            "ret": "void",
+            "args": [
+                ["alloc", "GtkAllocation *"]
+            ]
+        },
+        {
+            "name": "button_press_event",
+            "parent": "gtk:widget",
+            "ret": "void",
+            "args": [
+                ["event", "GdkEventButton *"]
+            ]
+        },
+        {
+            "name": "configure_event",
+            "parent": "gtk:widget",
+            "ret": "gint",
+            "args": [
+                ["event", "GdkEventConfigure *"]
+            ]
+        },
+        {
+            "name": "map",
+            "parent": "gtk:widget",
+            "ret": "void",
+            "args": []
+        }
+    ],
+
+    "api-methods": [
+        {
+            "name": "command",
+            "parent": "fb:panel",
+            "ret": "int",
+            "args": [
+                ["cmd", "gchar *"]
+            ]
+        }
+    ],
+
+    "constructors": [
+        {
+            "name": "new",
+            "ret": "RbPanel *",
+            "args": [
+                ["profile", "gchar *"]
+            ]
+        }
+    ]
+}
