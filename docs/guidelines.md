@@ -47,5 +47,5 @@ Go to project's [Releases](https://github.com/aanatoly/fbpanel/releases) page an
 
 ##### note1
 Github delays closing of the issue, until commit with `closes #NN` merges into
-`muster`. Which in our case happends quite rare. So to make issue tracker
+`master`. Which in our case happends quite rare. So to make issue tracker
 reflect real situation, we close it manually.
