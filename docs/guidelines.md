@@ -10,7 +10,7 @@ Steps:
  * Open github issue, say it's #9
  * Create feature branch named as issue's number
    `git flow feature start 9`
- * Develop and commit, every commit message should reference the issue, eg
+ * Develop and commit. Every commit message should reference the issue, eg
    include `[#9]` text. See [Note2](#note2) for helpfull stuff
  * Finish feature `git flow feature finish`
  * Close github issue **manually**. See [Note1](#note1) for explanation.
