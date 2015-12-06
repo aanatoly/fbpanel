@@ -8,7 +8,8 @@
     "h-includes": [
         "#include <X11/Xlib.h>",
         "#include <gtk/gtk.h>",
-        "#include <gdk/gdk.h>"
+        "#include <gdk/gdk.h>",
+        "#include \"enums.h\""
     ],
 
     "c-includes": [
@@ -21,22 +22,22 @@
         {
             "type": "GVarObject",
             "name": "layout",
-            "gname": "GtkWidget"
+            "gname": "gtk:widget"
         },
         {
             "type": "GVarObject",
             "name": "bg_box",
-            "gname": "GtkWidget"
+            "gname": "gtk:widget"
         },
         {
             "type": "GVarObject",
             "name": "plugins_box",
-            "gname": "GtkWidget"
+            "gname": "gtk:widget"
         },
         {
             "type": "GVarObject",
             "name": "menu",
-            "gname": "GtkWidget"
+            "gname": "gtk:widget"
         }
     ],
 
@@ -62,7 +63,7 @@
             "type": "GPropEnum",
             "name": "width_type",
             "gname": "fb:width",
-            "default": "precent"
+            "default": "percent"
         },
         {
             "type": "GPropInt",
@@ -106,7 +107,7 @@
         {
             "name": "button_press_event",
             "parent": "gtk:widget",
-            "ret": "void",
+            "ret": "gint",
             "args": [
                 ["event", "GdkEventButton *"]
             ]
@@ -141,7 +142,7 @@
     "constructors": [
         {
             "name": "new",
-            "ret": "RbPanel *",
+            "ret": "FbPanel *",
             "args": [
                 ["profile", "gchar *"]
             ]

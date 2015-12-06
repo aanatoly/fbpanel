@@ -10,6 +10,7 @@
 #include <X11/Xlib.h>
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
+#include "enums.h"
 
 
 G_BEGIN_DECLS
@@ -35,15 +36,16 @@ typedef struct _FbPanelClass FbPanelClass;
 struct _FbPanel {
     GtkWindow parent;
 
-    Gtkwidget *layout;
-    Gtkwidget *bg_box;
-    Gtkwidget *plugins_box;
-    Gtkwidget *menu;
+    GtkWidget *layout;
+    GtkWidget *bg_box;
+    GtkWidget *plugins_box;
+    GtkWidget *menu;
     gchar *profile;
     FbAlignType align;
     FbEdgeType edge;
     FbWidthType width_type;
     gint width;
+    gint height;
 };
 
 
@@ -55,7 +57,7 @@ struct _FbPanelClass {
 GType fb_panel_get_type(void) G_GNUC_CONST;
 
 int fb_panel_command(FbPanel *self, gchar *cmd);
-RbPanel *fb_panel_new(gchar *profile);
+FbPanel *fb_panel_new(gchar *profile);
 
 G_END_DECLS
 

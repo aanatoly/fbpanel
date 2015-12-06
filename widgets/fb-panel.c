@@ -18,11 +18,11 @@ static void fb_panel_set_property(GObject *g_object, guint param_id, const GValu
 static void fb_panel_constructed(GObject *g_object);
 static void fb_panel_size_request(GtkWidget *gtk_widget, GtkRequisition *requisition);
 static void fb_panel_size_allocate(GtkWidget *gtk_widget, GtkAllocation *alloc);
-static void fb_panel_button_press_event(GtkWidget *gtk_widget, GdkEventButton *event);
+static gint fb_panel_button_press_event(GtkWidget *gtk_widget, GdkEventButton *event);
 static gint fb_panel_configure_event(GtkWidget *gtk_widget, GdkEventConfigure *event);
 static void fb_panel_map(GtkWidget *gtk_widget);
 int fb_panel_command(FbPanel *self, gchar *cmd);
-RbPanel *fb_panel_new(gchar *profile);
+FbPanel *fb_panel_new(gchar *profile);
 
 
 #define SELF(o) FbPanel *self G_GNUC_UNUSED = FB_PANEL(o)
@@ -36,6 +36,7 @@ enum {
     PROP_EDGE,
     PROP_WIDTH_TYPE,
     PROP_WIDTH,
+    PROP_HEIGHT,
     PROP_LAST
 };
 
@@ -82,10 +83,14 @@ fb_panel_class_init(FbPanelClass *class)
         g_param_spec_enum("width-type",
             "Short desc", "Long desc",
             FB_TYPE_WIDTH_TYPE,
-            FB_WIDTH_PRECENT,
+            FB_WIDTH_PERCENT,
             G_PARAM_READWRITE));
     g_object_class_install_property(g_object_class, PROP_WIDTH,
         g_param_spec_int("width", "Short desc", "Long desc",
+            1, 3000, 80,
+            G_PARAM_READWRITE));
+    g_object_class_install_property(g_object_class, PROP_HEIGHT,
+        g_param_spec_int("height", "Short desc", "Long desc",
             1, 3000, 80,
             G_PARAM_READWRITE));
 }
@@ -96,8 +101,9 @@ fb_panel_init(FbPanel *self)
 {
     self->align = FB_ALIGN_CENTER;
     self->edge = FB_EDGE_BOTTOM;
-    self->width_type = FB_WIDTH_PRECENT;
+    self->width_type = FB_WIDTH_PERCENT;
     self->width = 80;
+    self->height = 80;
 }
 
 
@@ -156,6 +162,9 @@ fb_panel_get_property(GObject *g_object, guint param_id, GValue *value, GParamSp
     case PROP_WIDTH:
         g_value_set_int(value, self->width);
         break;
+    case PROP_HEIGHT:
+        g_value_set_int(value, self->height);
+        break;
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(g_object, param_id, pspec);
         break;
@@ -183,6 +192,9 @@ fb_panel_set_property(GObject *g_object, guint param_id, const GValue *value, GP
         break;
     case PROP_WIDTH:
         self->width = g_value_get_int(value);
+        break;
+    case PROP_HEIGHT:
+        self->height = g_value_get_int(value);
         break;
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(g_object, param_id, pspec);
@@ -218,12 +230,13 @@ fb_panel_size_allocate(GtkWidget *gtk_widget, GtkAllocation *alloc)
 }
 
 
-static void
+static gint
 fb_panel_button_press_event(GtkWidget *gtk_widget, GdkEventButton *event)
 {
     SELF(gtk_widget);
 
     GTK_WIDGET_CLASS(parent_class)->button_press_event(gtk_widget, event);
+    return 0;
 }
 
 
@@ -253,7 +266,7 @@ fb_panel_command(FbPanel *self, gchar *cmd)
 }
 
 
-RbPanel *
+FbPanel *
 fb_panel_new(gchar *profile)
 {
     return g_object_new(FB_TYPE_PANEL, "profile", profile, NULL);
