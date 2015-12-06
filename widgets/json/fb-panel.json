@@ -78,6 +78,37 @@
             "min_": 1,
             "max_": 3000,
             "default": "80"
+        },
+        {
+            "type": "GPropBoolean",
+            "name": "transparent",
+            "default": "TRUE"
+        },
+        {
+            "type": "GPropBoxed",
+            "name": "tint_color",
+            "gname": "gdk:color"
+        },
+        {
+            "type": "GPropInt",
+            "name": "tint_alpha",
+            "min_": 1,
+            "max_": 255,
+            "default": "80"
+        },
+        {
+            "type": "GPropInt",
+            "name": "pos_x",
+            "min_": 1,
+            "max_": 5255,
+            "default": "80"
+        },
+        {
+            "type": "GPropInt",
+            "name": "pos_y",
+            "min_": 1,
+            "max_": 5255,
+            "default": "80"
         }
     ],
 
@@ -113,6 +144,14 @@
             ]
         },
         {
+            "name": "scroll_event",
+            "parent": "gtk:widget",
+            "ret": "gboolean",
+            "args": [
+                ["event", "GdkEventScroll *"]
+            ]
+        },
+        {
             "name": "configure_event",
             "parent": "gtk:widget",
             "ret": "gint",
@@ -142,7 +181,7 @@
     "constructors": [
         {
             "name": "new",
-            "ret": "FbPanel *",
+            "ret": "GtkWidget *",
             "args": [
                 ["profile", "gchar *"]
             ]

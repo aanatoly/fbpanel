@@ -1,0 +1,51 @@
+{
+    "type" : "GObject",
+    "name" : "fb:xed:enum",
+    "parent" : "fb:xed",
+    "copyright" : "Copyright 2015 by anatoly@fgmail.com",
+    "licence" : "GPLv2",
+
+    "h-includes": [
+        "#include \"fb-xed.h\""
+    ],
+
+    "c-includes": [
+        "",
+        "//#define DEBUGPRN",
+        "#include \"dbg.h\""
+    ],
+
+
+    "methods": [
+        {
+            "name": "constructed",
+            "parent": "g:object",
+            "ret": "void",
+            "args": []
+        },
+        {
+            "name": "load",
+            "parent": "fb:xed",
+            "ret": "void",
+            "args": []
+        },
+        {
+            "name": "build",
+            "parent": "fb:xed",
+            "ret": "void",
+            "args": []
+        }
+    ],
+
+    "constructors": [
+        {
+            "name": "new",
+            "ret": "GtkWidget *",
+            "args": [
+                ["master", "GObject *"],
+                ["prop_name", "gchar *"],
+                ["size_group", "GtkSizeGroup *"]
+            ]
+        }
+    ]
+}

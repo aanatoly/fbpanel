@@ -36,6 +36,7 @@ typedef struct _FbPanelClass FbPanelClass;
 struct _FbPanel {
     GtkWindow parent;
 
+    // start instance vars
     GtkWidget *layout;
     GtkWidget *bg_box;
     GtkWidget *plugins_box;
@@ -46,6 +47,14 @@ struct _FbPanel {
     FbWidthType width_type;
     gint width;
     gint height;
+    gboolean transparent;
+    GdkColor tint_color;
+    gint tint_alpha;
+    gint pos_x;
+    gint pos_y;
+    // end instance vars
+    guint lid;
+    GdkRectangle pos, req;
 };
 
 
@@ -57,7 +66,7 @@ struct _FbPanelClass {
 GType fb_panel_get_type(void) G_GNUC_CONST;
 
 int fb_panel_command(FbPanel *self, gchar *cmd);
-FbPanel *fb_panel_new(gchar *profile);
+GtkWidget *fb_panel_new(gchar *profile);
 
 G_END_DECLS
 

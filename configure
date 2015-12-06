@@ -315,7 +315,7 @@ def write_config():
     sc = "// Generated at %s \n// by command %s\n\n" % (now, sys.argv)
 
     for name in sorted(vars.keys()):
-        smake += "%s ?= %s\n" % (name, vars[name])
+        smake += "%s = %s\n" % (name, vars[name])
     smake += "\n"
 
     for name in opt_order:
