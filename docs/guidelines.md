@@ -11,7 +11,7 @@ Steps:
  * Create feature branch named as issue's number
    `git flow feature start 9`
  * Develop and commit, every commit message should reference the issue, eg
-   include `[#9]` text. See [Note2] for helpfull stuff
+   include `[#9]` text. See [Note2](#note2) for helpfull stuff
  * Finish feature `git flow feature finish`
  * Close github issue **manually**. See [Note1](#note1) for explanation.
  * Update changelog with [git-changelog](https://github.com/aanatoly/git-changelog)
