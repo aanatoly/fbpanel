@@ -1,6 +1,15 @@
 
+## Version: develop
+Date: 2015-12-06 00:57:47
+
+ * [#14] give gravatar file unique name to avoid collisions with other panels
+ * [#11] new plugin: user menu with gravatar icon
+
+[#14]: https://github.com/aanatoly/fbpanel/issues/14
+[#11]: https://github.com/aanatoly/fbpanel/issues/11
+
 ## Version: 7.0
-Date: 2015-12-05 08:25:36
+Date: 2015-12-05 08:34:21
 
  * [#12] fix menu position for top panel
  * [#11] new plugin: user menu with gravatar icon
