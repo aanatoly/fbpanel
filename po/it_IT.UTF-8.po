@@ -1,0 +1,216 @@
+# French translations for fbpanel package.
+# Copyright (C) 2010 THE fbpanel'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the fbpanel package.
+# Automatically generated, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: fbpanel 7.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-01-25 02:07+0200\n"
+"PO-Revision-Date: 2016-01-25 02:07+0200\n"
+"Last-Translator: Automaticaly generated\n"
+"Language-Team: none\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: panel/gconf_panel.c:57
+msgid "<b>Visual Effects</b>"
+msgstr "<b>Effetti grafici</b>"
+
+#: panel/gconf_panel.c:65
+msgid "Transparency"
+msgstr "Trasparenza"
+
+#: panel/gconf_panel.c:69
+msgid "Color settings"
+msgstr "Colori"
+
+#: panel/gconf_panel.c:79
+msgid "Round corners"
+msgstr "Angoli arrotondati"
+
+#: panel/gconf_panel.c:83
+msgid "Radius is "
+msgstr "Raggio di "
+
+#: panel/gconf_panel.c:87 panel/gconf_panel.c:101 panel/misc.c:89
+msgid "pixels"
+msgstr "pixel"
+
+#: panel/gconf_panel.c:93
+msgid "Autohide"
+msgstr "Nascondi automaticamente"
+
+#: panel/gconf_panel.c:97
+msgid "Height when hidden is "
+msgstr "Altezza quando nascosto "
+
+#: panel/gconf_panel.c:106
+msgid "Max Element Height"
+msgstr "Altezza massima elemento"
+
+#: panel/gconf_panel.c:138
+msgid "<b>Properties</b>"
+msgstr "<b>Proprietà</b>"
+
+#: panel/gconf_panel.c:146
+msgid "Do not cover by maximized windows"
+msgstr "Non coperto dalle finestre massimizzate"
+
+#: panel/gconf_panel.c:150
+msgid "Set 'Dock' type"
+msgstr "Tipo 'Dock'"
+
+#: panel/gconf_panel.c:155
+msgid "Set stacking layer"
+msgstr "Layer"
+
+#: panel/gconf_panel.c:159
+msgid "Panel is "
+msgstr "Il pannello è "
+
+#: panel/gconf_panel.c:164
+msgid "all windows"
+msgstr "tutte le finestre"
+
+#: panel/gconf_panel.c:209
+msgid "<b>Geometry</b>"
+msgstr "<b>Geometria</b>"
+
+#: panel/gconf_panel.c:216
+msgid "Width"
+msgstr "Larghezza"
+
+#: panel/gconf_panel.c:226
+msgid "Height"
+msgstr "Altezza"
+
+#: panel/gconf_panel.c:231
+msgid "Edge"
+msgstr "Bordo"
+
+#: panel/gconf_panel.c:236
+msgid "Allignment"
+msgstr "Allineamento"
+
+#: panel/gconf_panel.c:241
+msgid "Margin"
+msgstr "Margine"
+
+#: panel/gconf_panel.c:285
+#, c-format
+msgid ""
+"You're using '<b>%s</b>' profile, stored at\n"
+"<tt>%s</tt>"
+msgstr ""
+"Stai usando il profilo '<b>%s</b>', salvato in\n"
+"<tt>%s</tt>"
+
+#: panel/gconf_panel.c:388
+msgid "Panel"
+msgstr "Pannello"
+
+#: panel/gconf_panel.c:393
+msgid "Plugins"
+msgstr "Plugin"
+
+#: panel/gconf_panel.c:398
+msgid "Profile"
+msgstr "Profilo"
+#: panel/misc.c:75 panel/misc.c:81
+msgid "left"
+msgstr "sinistra"
+
+#: panel/misc.c:76 panel/misc.c:82
+msgid "right"
+msgstr "destra"
+
+#: panel/misc.c:77
+msgid "center"
+msgstr "centro"
+
+#: panel/misc.c:83
+msgid "top"
+msgstr "alto"
+
+#: panel/misc.c:84
+msgid "bottom"
+msgstr "basso"
+
+#: panel/misc.c:88
+msgid "dynamic"
+msgstr "dinamico"
+
+#: panel/misc.c:90
+#, c-format
+msgid "% of screen"
+msgstr "% dello schermo"
+
+#: panel/misc.c:94
+msgid "pixel"
+msgstr "pixel"
+
+#: panel/misc.c:109
+msgid "above"
+msgstr "sopra"
+
+#: panel/misc.c:110
+msgid "below"
+msgstr "sotto"
+
+#: panel/panel.c:464
+msgid "translator-credits"
+msgstr "Man from Mars <martianpostbox@gmail.com>"
+
+#: plugins/menu/system_menu.c:24
+msgid "Audio & Video"
+msgstr "Audio e Video"
+
+#: plugins/menu/system_menu.c:25
+msgid "Education"
+msgstr "Istruzione"
+
+#: plugins/menu/system_menu.c:26
+msgid "Game"
+msgstr "Giochi"
+
+#: plugins/menu/system_menu.c:27
+msgid "Graphics"
+msgstr "Grafica"
+
+#: plugins/menu/system_menu.c:28
+msgid "Network"
+msgstr "Rete"
+
+#: plugins/menu/system_menu.c:29
+msgid "Office"
+msgstr "Ufficio"
+
+#: plugins/menu/system_menu.c:30
+msgid "Settings"
+msgstr "Impostazioni"
+
+#: plugins/menu/system_menu.c:31
+msgid "System"
+msgstr "Sistema"
+
+#: plugins/menu/system_menu.c:32
+msgid "Utilities"
+msgstr "Strumenti"
+
+#: plugins/menu/system_menu.c:33
+msgid "Development"
+msgstr "Sviluppo"
+
+#: plugins/taskbar/taskbar.c:1267
+msgid "Raise"
+msgstr "Ripristina"
+
+#: plugins/taskbar/taskbar.c:1274
+msgid "Iconify"
+msgstr "Riduci a icona"
+
