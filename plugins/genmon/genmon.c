@@ -46,7 +46,7 @@ text_update(genmon_priv *gm)
     const unsigned int cMAX_LINES_COUNT = 60;
     char text[cMAX_LINE_LENGHT];
     char text2[cMAX_LINE_LENGHT*cMAX_LINES_COUNT];
-    text2 = 0;
+    *text2 = 0;
     char *markup;
     int len;
     unsigned int count = 0;
@@ -74,7 +74,7 @@ text_update(genmon_priv *gm)
     };
     pclose(fp);
     len = strlen(text2) - 1;
-    if (len >=0)
+        if (len >=0)
     {
         if(text2[len] == '\n') text2[len] = 0;
         gtk_widget_set_tooltip_markup(gm->plugin.pwid, text2);
@@ -116,6 +116,7 @@ genmon_constructor(plugin_instance *p)
     XCG(p->xc, "TextColor", &gm->textcolor, str);
     XCG(p->xc, "PollingTime", &gm->time, int);
     XCG(p->xc, "MaxTextLength", &gm->max_text_len, int);
+    XCG(p->xc, "ToolTip", &gm->tooltip, str);
     
     gm->main = gtk_label_new(NULL);
     gtk_label_set_max_width_chars(GTK_LABEL(gm->main), gm->max_text_len);
