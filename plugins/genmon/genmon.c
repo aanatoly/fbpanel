@@ -34,20 +34,26 @@ typedef struct {
     char *command;
     char *textsize;
     char *textcolor;
+    char* tooltip;
     GtkWidget *main;
 } genmon_priv;
 
 static int
 text_update(genmon_priv *gm)
 {
-    FILE *fp;  
-    char text[256];
+    FILE *fp;
+    const unsigned int  cMAX_LINE_LENGHT = 256;
+    const unsigned int cMAX_LINES_COUNT = 60;
+    char text[cMAX_LINE_LENGHT];
+    char text2[cMAX_LINE_LENGHT*cMAX_LINES_COUNT];
+    text2 = 0;
     char *markup;
     int len;
-
+    unsigned int count = 0;
+    
     ENTER;
     fp = popen(gm->command, "r");
-    if (fgets(text, sizeof(text), fp));
+    if (fgets(text, cMAX_LINE_LENGHT, fp));
     pclose(fp);
     len = strlen(text) - 1;
     if (len >= 0) {
@@ -58,6 +64,24 @@ text_update(genmon_priv *gm)
             text);
         gtk_label_set_markup (GTK_LABEL(gm->main), markup);
         g_free(markup);
+    }
+    fp = popen(gm->tooltip, "r");
+    while((fgets(text, cMAX_LINE_LENGHT, fp) != NULL) && (count < cMAX_LINES_COUNT))
+    {
+        text[strlen(text)-1] = '\n';
+        strcat(text2,text);
+        count++;
+    };
+    pclose(fp);
+    len = strlen(text2) - 1;
+    if (len >=0)
+    {
+        if(text2[len] == '\n') text2[len] = 0;
+        gtk_widget_set_tooltip_markup(gm->plugin.pwid, text2);
+    }
+    else
+    {
+        gtk_widget_set_tooltip_markup(gm->plugin.pwid, "");
     }
     RET(TRUE);
 }
