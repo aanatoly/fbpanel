@@ -16,6 +16,8 @@ typedef struct {
     gint dummy;
     guint sid;
     GPid pid;
+    gchar *gravatar_path;
+    int gfd;
 } user_priv;
 
 static menu_class *k;
@@ -30,7 +32,6 @@ fetch_gravatar_done(GPid pid, gint status, gpointer data)
 {
     user_priv *c G_GNUC_UNUSED = data;
     plugin_instance *p G_GNUC_UNUSED = data;
-    gchar *image = NULL, *icon = NULL;
 
     ENTER;
     DBG("status %d\n", status);
@@ -38,23 +39,18 @@ fetch_gravatar_done(GPid pid, gint status, gpointer data)
     c->pid = 0;
     c->sid = 0;
 
-    if (status)
+    if (status) {
+        gchar *gravatar = NULL;
+        XCG(p->xc, "gravataremail", &gravatar, str);
+        ERR("Failed to fetch gravatar for '%s'\n", gravatar);
+        ERR("wget error: %d\n", status);
         RET();
+    }
     DBG("rebuild menu\n");
-    XCG(p->xc, "icon", &icon, strdup);
-    XCG(p->xc, "image", &image, strdup);
-    XCS(p->xc, "image", image, value);
+    XCS(p->xc, "image", c->gravatar_path, value);
     xconf_del(xconf_find(p->xc, "icon", 0), FALSE);
     PLUGIN_CLASS(k)->destructor(p);
     PLUGIN_CLASS(k)->constructor(p);
-    if (image) {
-        XCS(p->xc, "image", image, value);
-        g_free(image);
-    }
-    if (icon) {
-        XCS(p->xc, "icon", icon, value);
-        g_free(icon);
-    }
     RET();
 }
 
@@ -67,14 +63,19 @@ fetch_gravatar(gpointer data)
     GChecksum *cs;
     gchar *gravatar = NULL;
     gchar buf[GRAVATAR_LEN];
-    // FIXME: select more secure path
-    gchar *image = "/tmp/gravatar";
-    gchar *argv[] = { "wget", "-q", "-O", image, buf, NULL };
+    gchar *argv[] = { "wget", "-q", "-O", NULL, buf, NULL };
 
     ENTER;
     cs = g_checksum_new(G_CHECKSUM_MD5);
     XCG(p->xc, "gravataremail", &gravatar, str);
     g_checksum_update(cs, (guchar *) gravatar, -1);
+    c->gfd = g_file_open_tmp("gravatar.XXXXXX", &c->gravatar_path, NULL);
+    if (c->gfd < 0) {
+        ERR("Can't open tmp gravatar file\n");
+        RET(FALSE);
+    }
+    DBG("tmp file '%s'\n", c->gravatar_path);
+    argv[3] = c->gravatar_path;
     snprintf(buf, sizeof(buf), "http://www.gravatar.com/avatar/%s",
         g_checksum_get_string(cs));
     g_checksum_free(cs);
@@ -89,17 +90,11 @@ static int
 user_constructor(plugin_instance *p)
 {
     user_priv *c G_GNUC_UNUSED = (user_priv *) p;
-    gchar *image = NULL;
-    gchar *icon = NULL;
     gchar *gravatar = NULL;
 
     ENTER;
     if (!(k = class_get("menu")))
         RET(0);
-    XCG(p->xc, "image", &image, str);
-    XCG(p->xc, "icon", &icon, str);
-    if (!(image || icon))
-        XCS(p->xc, "icon", "avatar-default", value);
     if (!PLUGIN_CLASS(k)->constructor(p))
         RET(0);
     XCG(p->xc, "gravataremail", &gravatar, str);
@@ -122,6 +117,12 @@ user_destructor(plugin_instance *p)
         kill(c->pid, SIGKILL);
     if (c->sid)
         g_source_remove(c->sid);
+    if (c->gfd > 0)
+        close(c->gfd);
+    if (c->gravatar_path) {
+        unlink(c->gravatar_path);
+        g_free(c->gravatar_path);
+    }
     class_put("menu");
     RET();
 }

@@ -49,10 +49,16 @@ do_app_file(GHashTable *ht, const gchar *file)
     f = g_key_file_new();
     if (!g_key_file_load_from_file(f, file, 0, NULL))
         goto out;
+    if (!(cats = g_key_file_get_string_list(f,
+                desktop_ent, "Categories", NULL, NULL)))
+    {
+        DBG("\tNo Categories\n");
+        goto out;
+    }
     if (g_key_file_get_boolean(f, desktop_ent, "NoDisplay", NULL))
     {
         DBG("\tNoDisplay\n");
-        goto out;
+        goto pre_out;
     }
     if (g_key_file_has_key(f, desktop_ent, "OnlyShowIn", NULL))
     {
@@ -64,13 +70,7 @@ do_app_file(GHashTable *ht, const gchar *file)
         DBG("\tNo Exec\n");
         goto out;
     }
-    if (!(cats = g_key_file_get_string_list(f,
-                desktop_ent, "Categories", NULL, NULL)))
-    {
-        DBG("\tNo Categories\n");
-        goto out;
-    }
-    if (!(name = g_key_file_get_locale_string(f,
+     if (!(name = g_key_file_get_locale_string(f,
                 desktop_ent, "Name", NULL, NULL)))
     {
         DBG("\tNo Name\n");
@@ -95,7 +95,7 @@ do_app_file(GHashTable *ht, const gchar *file)
         *dot = '\0';
     }
     DBG("icon: %s\n", icon);
-    
+pre_out:    
     for (mxc = NULL, tmp = cats; *tmp; tmp++) 
         if ((mxc = g_hash_table_lookup(ht, *tmp)))
             break;
@@ -104,7 +104,30 @@ do_app_file(GHashTable *ht, const gchar *file)
         DBG("\tUnknown categories\n");
         goto out;
     }
-    
+   GSList *ixc_list, *vxc_list;
+   for (ixc_list = mxc->sons; ixc_list; ixc_list = g_slist_next(ixc_list))
+   {
+   	if(ixc_list)
+	{	
+		ixc = ixc_list->data;
+		for (vxc_list = ixc->sons; vxc_list; vxc_list = g_slist_next(vxc_list))
+			if (vxc_list)
+			{
+				vxc = vxc_list->data;
+				if (g_strcmp0(vxc->value, file) == 0)
+				{
+					xconf_del(ixc,FALSE);
+					break;
+				}
+			}
+	}
+   }
+   if (g_key_file_get_boolean(f, desktop_ent, "NoDisplay", NULL))
+    {
+        DBG("\tNoDisplay\n");
+        goto out;
+    }
+
     ixc = xconf_new("item", NULL);
     xconf_append(mxc, ixc);
     if (icon)
@@ -116,7 +139,9 @@ do_app_file(GHashTable *ht, const gchar *file)
     xconf_append(ixc, vxc);
     vxc = xconf_new("action", action);
     xconf_append(ixc, vxc);
-
+    vxc = xconf_new("name", (char*) file);
+    xconf_append(ixc,vxc);
+ 
 out:
     g_free(icon);
     g_free(name);
