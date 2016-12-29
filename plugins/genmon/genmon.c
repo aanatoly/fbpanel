@@ -31,35 +31,77 @@ typedef struct {
     int time;
     int timer;
     int max_text_len;
+    int allow_pango_markup;
     char *command;
     char *textsize;
     char *textcolor;
+    char* tooltip;
     GtkWidget *main;
 } genmon_priv;
 
 static int
 text_update(genmon_priv *gm)
 {
-    FILE *fp;  
-    char text[256];
+    FILE *fp; 
+    const unsigned int  cMAX_LINE_LENGHT = 256;
+    const unsigned int cMAX_LINES_COUNT = 60;
+    char text[cMAX_LINE_LENGHT];
+    char text2[cMAX_LINE_LENGHT*cMAX_LINES_COUNT];
+    *text2 = 0;
+    int text_len;
     char *markup;
     int len;
-
+    unsigned int count = 0;
+    
     ENTER;
     fp = popen(gm->command, "r");
-    if (fgets(text, sizeof(text), fp));
+    if (fgets(text, cMAX_LINE_LENGHT, fp));
+    /* allow for multi-byte characters and a null-terminator */
+    text_len = (4 * gm->max_text_len) + 1;
+    text = malloc(text_len);
+    if (text == NULL) {
+	/* ignore for now; try again later */
+	RET(TRUE);
+    }
+    /* Ensure null-termination even if read fails */
+    text[0] = 0;
+    if (fgets(text, text_len, fp));
     pclose(fp);
     len = strlen(text) - 1;
     if (len >= 0) {
         if (text[len] == '\n')
             text[len] = 0;
         
-        markup = g_markup_printf_escaped(FMT, gm->textsize, gm->textcolor,
-            text);
-        gtk_label_set_markup (GTK_LABEL(gm->main), markup);
-        g_free(markup);
+        if (gm->allow_pango_markup) {
+            gtk_label_set_markup (GTK_LABEL(gm->main), text);
+        }
+        else {
+            markup = g_markup_printf_escaped(FMT, gm->textsize, gm->textcolor,
+                                             text);
+            gtk_label_set_markup (GTK_LABEL(gm->main), markup);
+            g_free(markup);
+        }
     }
-    RET(TRUE);
+    fp = popen(gm->tooltip, "r");
+    while((fgets(text, cMAX_LINE_LENGHT, fp) != NULL) && (count < cMAX_LINES_COUNT))
+    {
+        text[strlen(text)-1] = '\n';
+        strcat(text2,text);
+        count++;
+    };
+    pclose(fp);
+    len = strlen(text2) - 1;
+        if (len >=0)
+    {
+        if(text2[len] == '\n') text2[len] = 0;
+        gtk_widget_set_tooltip_markup(gm->plugin.pwid, text2);
+    }
+    else
+    {
+        gtk_widget_set_tooltip_markup(gm->plugin.pwid, "");
+    }
+    free(text);
+ RET(TRUE);
 }
 
 static void
@@ -86,12 +128,17 @@ genmon_constructor(plugin_instance *p)
     gm->textsize = "medium";
     gm->textcolor = "darkblue";
     gm->max_text_len = 30;
+    gm->allow_pango_markup = 0;
     
     XCG(p->xc, "Command", &gm->command, str);
     XCG(p->xc, "TextSize", &gm->textsize, str);
     XCG(p->xc, "TextColor", &gm->textcolor, str);
     XCG(p->xc, "PollingTime", &gm->time, int);
     XCG(p->xc, "MaxTextLength", &gm->max_text_len, int);
+    XCG(p->xc, "ToolTip", &gm->tooltip, str);
+
+    XCG(p->xc, "AllowPangoMarkup", &gm->allow_pango_markup, int);
+
     
     gm->main = gtk_label_new(NULL);
     gtk_label_set_max_width_chars(GTK_LABEL(gm->main), gm->max_text_len);
