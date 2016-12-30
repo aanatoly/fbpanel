@@ -122,8 +122,8 @@ genmon_constructor(plugin_instance *p)
     XCG(p->xc, "PollingTime", &gm->time, int);
     XCG(p->xc, "MaxTextLength", &gm->max_text_len, int);
     XCG(p->xc, "ToolTip", &gm->tooltip, str);
-    XCG(p->xc, "ToolTipLineLenght", &gm->max_tooltip_line_len, int);
-    XCG(p->xc, "ToolTipLinesCount", &gm->max_tooltip_lines_count, int);
+    XCG(p->xc, "ToolTipLineLenght", (int*) &gm->max_tooltip_line_len, int);
+    XCG(p->xc, "ToolTipLinesCount", (int*) &gm->max_tooltip_lines_count, int);
     
     gm->main = gtk_label_new(NULL);
     gtk_label_set_max_width_chars(GTK_LABEL(gm->main), gm->max_text_len);
