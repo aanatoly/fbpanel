@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 umask 0077
 # new profile directory

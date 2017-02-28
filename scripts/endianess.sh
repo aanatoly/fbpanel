@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # When cross compiling, you may put cross compiler directory 
 # in PATH before native gcc (aka spoofing), or you may set CC 
