@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Tt runs pkg-config in a way that everything is searched under RFS
 # but reported including full path. Suitable for cross-compiling
