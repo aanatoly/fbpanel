@@ -34,7 +34,7 @@ target_include_directories(fbpanel
         ${MODULES_INCLUDE_DIRS}
 )
 
-set(PLUGINS battery cpu deskno genmon image mem2 meter pager space tclock volume chart dclock deskno2 icons launchbar mem menu net separator taskbar tray user wincmd)
+set(PLUGINS battery batterytext cpu deskno genmon image mem2 meter pager space tclock volume chart dclock deskno2 icons launchbar mem menu net separator taskbar tray user wincmd)
 
 foreach(PLUGIN ${PLUGINS})
 
