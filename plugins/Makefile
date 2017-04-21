@@ -3,6 +3,7 @@
 TOPDIR := ..
 
 SUBDIRS := battery \
+    batterytext \
     chart \
     cpu \
     dclock \
