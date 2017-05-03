@@ -34,65 +34,83 @@ typedef struct {
     GtkWidget *main;
 } batterytext_priv;
 
+static float
+read_bat_value(const char *dn, const char *fn)
+{
+    FILE *fp;
+    float value = -1;
+    char value_path[256];
+    g_snprintf(value_path, sizeof(value_path), "%s/%s", dn, fn);
+    fp = fopen(value_path, "r");
+    if (fp != NULL) {
+        if (fscanf(fp, "%f", &value) != 1)
+            value = -1;
+        fclose(fp);
+    }
+    return value;
+}
+
 static int
 text_update(batterytext_priv *gm)
 {
-    FILE *fp_info;
-    FILE *fp_state;
-    char battery_state[256];
-    char battery_info[256];
+    FILE *fp_status;
+    char battery_status[256];
     char *markup;
+    char *tooltip;
     char buffer[256];
-    int capacity_design = -1;
-    int capacity_last = -1;
+    float energy_full_design = -1;
+    float energy_full = -1;
+    float energy_now = -1;
+    float power_now = -1;
     int discharging = 0;
-    int charge_present = -1;
-    int chrg_rate = -1;
     float charge_ratio = 0;
+    int charge_time = 0;
 
     ENTER;
-    g_snprintf(battery_info, sizeof(battery_info), "%s/info", gm->battery);
-    g_snprintf(battery_state, sizeof(battery_state), "%s/state", gm->battery);
+    energy_full_design = read_bat_value(gm->battery, "energy_full_design");
+    energy_full = read_bat_value(gm->battery, "energy_full");
+    energy_now = read_bat_value(gm->battery, "energy_now");
+    power_now = read_bat_value(gm->battery, "power_now");
 
-    snprintf(battery_info, sizeof(battery_info), "%s/info", "/proc/acpi/battery/BAT1");
-    snprintf(battery_state, sizeof(battery_state), "%s/state", "/proc/acpi/battery/BAT1");
-
-    fp_info = fopen(battery_info, "r");
-    if (fp_info != NULL) {
-        while ((fgets(buffer, sizeof(buffer), fp_info)) != NULL) {
-            if (sscanf(buffer, "design capacity: %d", &capacity_design));
-            else if (sscanf(buffer, "last full capacity: %d", &capacity_last));
-        }
-        fclose(fp_info);
-    }
-
-    fp_state = fopen(battery_state, "r");
-    if (fp_state != NULL) {
-        while ((fgets(buffer, sizeof(buffer), fp_state)) != NULL) {
-            if (strstr(buffer, "discharging\n") != NULL)
+    snprintf(battery_status, sizeof(battery_status), "%s/status", gm->battery);
+    fp_status = fopen(battery_status, "r");
+    if (fp_status != NULL) {
+        while ((fgets(buffer, sizeof(buffer), fp_status)) != NULL) {
+            if (strstr(buffer, "Discharging") != NULL)
                 discharging = 1;
-            if (sscanf(buffer, "remaining capacity: %d", &charge_present));
-            else if (sscanf(buffer, "present rate: %d", &chrg_rate));
         }
-        fclose(fp_state);
+        fclose(fp_status);
     }
 
-    if ((capacity_design >= 0) && (charge_present >= 0)) {
+    if ((energy_full_design >= 0) && (energy_now >= 0)) {
         if (gm->design)
-            charge_ratio = 100 * charge_present / (double)capacity_design;
+            charge_ratio = 100 * energy_now / energy_full_design;
         else
-            charge_ratio = 100 * charge_present / (double)capacity_last;
+            charge_ratio = 100 * energy_now / energy_full;
         if (discharging)
+        {
             markup = g_markup_printf_escaped("<span size='%s' foreground='red'><b>%.2f-</b></span>",
                 gm->textsize, charge_ratio);
+            charge_time = (int)(energy_now / power_now * 3600);
+        }
         else
+        {
             markup = g_markup_printf_escaped("<span size='%s' foreground='green'><b>%.2f+</b></span>",
                 gm->textsize, charge_ratio);
+            charge_time = (int)((energy_full - energy_now) / power_now * 3600);
+        }
+        tooltip = g_markup_printf_escaped("%02d:%02d:%02d",
+            charge_time / 3600, (charge_time / 60) % 60, charge_time % 60);
         gtk_label_set_markup (GTK_LABEL(gm->main), markup);
         g_free(markup);
+        gtk_widget_set_tooltip_markup (gm->main, tooltip);
+        g_free(tooltip);
     }
     else
+    {
         gtk_label_set_markup (GTK_LABEL(gm->main), "N/A");
+        gtk_widget_set_tooltip_markup (gm->main, "N/A");
+    }
     RET(TRUE);
 }
 
@@ -118,7 +136,7 @@ batterytext_constructor(plugin_instance *p)
     gm->design = False;
     gm->time = 500;
     gm->textsize = "medium";
-    gm->battery = "/proc/acpi/battery/BAT1";
+    gm->battery = "/sys/class/power_supply/BAT0";
 
     XCG(p->xc, "DesignCapacity", &gm->design, enum, bool_enum);
     XCG(p->xc, "PollingTimeMs", &gm->time, int);
