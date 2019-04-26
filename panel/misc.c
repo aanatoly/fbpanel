@@ -845,6 +845,10 @@ fb_pixbuf_make_back_image(GdkPixbuf *front, gulong hicolor)
     int i;
 
     ENTER;
+    if(!front)
+    {
+        RET(front);
+    }
     back = gdk_pixbuf_add_alpha(front, FALSE, 0, 0, 0);
     if (!back) {
         g_object_ref(G_OBJECT(front));
@@ -875,6 +879,10 @@ fb_pixbuf_make_press_image(GdkPixbuf *front)
     int w, h;
 
     ENTER;
+    if(!front)
+    {
+        RET(front);
+    }
     w = gdk_pixbuf_get_width(front) - 2 * PRESS_GAP;
     h = gdk_pixbuf_get_height(front) - 2 * PRESS_GAP;
     press = gdk_pixbuf_copy(front);
