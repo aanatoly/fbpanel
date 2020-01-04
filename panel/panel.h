@@ -57,6 +57,9 @@ typedef struct _panel
     int round_corners_radius;
     int max_elem_height;
 
+    int xineramaHead;
+    GdkRectangle screenRect;
+
     gint self_destroy;
     gint setdocktype;
     gint setstrut;
@@ -189,5 +192,7 @@ gchar *panel_get_profile_file(void);
 
 void ah_start(panel *p);
 void ah_stop(panel *p);
+
+#define FBPANEL_INVALID_XINERAMA_HEAD (-1)
 
 #endif
