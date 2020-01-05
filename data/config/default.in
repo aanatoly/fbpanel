@@ -82,6 +82,7 @@
 # First parameter is 'type'. It's mandatory and must come first
 # Legal values are plugin names. Names of builtin plugins are:
 # separator   - visual separator
+# vbox        - put sub-elements (other plugins) vertically
 # wincmd      - 'show desktop' button
 # taskbar     - lists all opened windows (tasks)
 # launchbar   - bar with launch button

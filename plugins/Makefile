@@ -23,6 +23,7 @@ SUBDIRS := battery \
     systray \
     taskbar \
     tclock \
+    vbox \
     volume \
     wincmd \
     user
