@@ -90,6 +90,7 @@
 # space       - just seize space
 # pager       - thumbnailed view of the desktop
 # tray        - tray for XEMBED icons (aka docklets)
+# clip        - clipboard manager
 
 # expand - specifies if plugin can accomodate extra space or not [optional]
 # padding - extra padding around plugin  [optional]
@@ -320,6 +321,16 @@ plugin {
 #plugin {
 #    type = battery
 #}
+
+Plugin {
+    type = clip
+    config {
+        icon = editpaste
+        HistorySize = 40
+        SaveFullHistory = false
+        HistoryFile = ~/.config/fbpanel/clip.history
+    }
+}
 
 Plugin {
     type = tray
