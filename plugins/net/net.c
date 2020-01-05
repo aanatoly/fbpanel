@@ -56,6 +56,7 @@ net_get_load_real(net_priv *c, struct net_stat *net)
 {
     FILE *stat;
     char buf[256], *s = NULL;
+    char *iface = g_strdup_printf("%s:", c->iface);
 
     stat = fopen("/proc/net/dev", "r");
     if(!stat)
@@ -64,7 +65,9 @@ net_get_load_real(net_priv *c, struct net_stat *net)
     if (fgets(buf, 256, stat));
 
     while (!s && !feof(stat) && fgets(buf, 256, stat))
-        s = g_strrstr(buf, c->iface);
+        s = g_strrstr(buf, iface);
+        // can be multiple lines start with `c->iface` in stat file,
+        // so match full interface name field by matching with colon
     fclose(stat);
     if (!s)
         return -1;
@@ -75,9 +78,11 @@ net_get_load_real(net_priv *c, struct net_stat *net)
     if (sscanf(s,
             "%lu  %*d     %*d  %*d  %*d  %*d   %*d        %*d       %lu",
             &net->rx, &net->tx)!= 2) {
-        DBG("can't read %s statistics\n", c->iface);
+        DBG("can't read %s statistics %s\n", c->iface, s);
         return -1;
-    }
+    } else {
+		 DBG("STAT: %s\n", s);
+	}
     return 0;
 }
 
