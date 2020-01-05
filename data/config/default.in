@@ -340,6 +340,16 @@ Plugin {
         HoursView = 24
         TooltipFmt = %A %x
         #Action = xmessage Please define some command &
+        ShowCalendar = true
+        # clock support multiple timezones/locale setting - switch via mouse sroll
+        # set number of config sets
+        ZoneNum = 2
+        # set first config set
+        TimeZone0 = Europe/Warsaw
+        Locale0 = pl_PL.UTF-8
+        # set next config set
+        TimeZone1 = UTC
+        Locale1 = C.UTF-8
     }
 }
 
