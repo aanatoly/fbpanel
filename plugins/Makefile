@@ -18,6 +18,7 @@ SUBDIRS := battery \
     meter \
     net \
     pager \
+    runbox \
     separator \
     space \
     systray \

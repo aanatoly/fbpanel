@@ -84,6 +84,7 @@
 # separator   - visual separator
 # wincmd      - 'show desktop' button
 # taskbar     - lists all opened windows (tasks)
+# runbox      - popup window with run dialog
 # launchbar   - bar with launch button
 # image       - just shows an image
 # dclock      - digital clock
@@ -193,8 +194,23 @@ Plugin {
 
 
 Plugin {
+    type = runbox
+    config {
+        show = none
+        icon = fbpanel-run
+        HistorySize = 20
+        HistoryFile = ~/.config/fbpanel/run.history
+    }
+}
+
+Plugin {
     type = launchbar
     config {
+        button {
+            icon = exec
+            tooltip = Run ...
+            action = dbus-send --session --type=signal /net/sourceforge/fbpanel/runcmd net.sourceforge.fbpanel.Signal.RunCmd string:
+        }
         button {
             icon = file-manager
             tooltip = File Manager
