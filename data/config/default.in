@@ -263,7 +263,21 @@ Plugin {
 Plugin {
     type = pager
     config {
+        # show wallpaper background in pager
         showwallpaper = true
+
+        # show icons on windows in pager
+        ShowIcon = true
+        IconSize = 24
+        IconMinSize = 8
+
+        # show desktop names in pager
+        ShowNamesInPager = true
+        ShowNamesInTooltip = true
+        NamesHeight = 12
+        NamesFmt = <span color="black" font="7">%s</span>
+        NamesBackgroundNormal = #cccccc
+        NamesBackgroundActive = #808080
     }
 }
 
