@@ -28,6 +28,11 @@
 
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <gdk-pixbuf-xlib/gdk-pixbuf-xlib.h>
+#include <gdk/gdk.h>
+
 #include "panel.h"
 #include "misc.h"
 #include "plugin.h"
@@ -47,6 +52,7 @@ typedef struct _task {
     guint stacking;
     guint desktop;
     char *name, *iname;
+    GdkPixbuf *icon;
     net_wm_state nws;
     net_wm_window_type nwwt;
 } task;
@@ -58,6 +64,9 @@ typedef struct _pager_priv  pager_priv;
 /* map of a desktop */
 struct _desk {
     GtkWidget *da;
+    GtkWidget  *da_name_box;
+    GtkWidget  *da_name_text;
+    GtkWidget  *da_vbox;
     Pixmap xpix;
     GdkPixmap *gpix;
     GdkPixmap *pix;
@@ -73,6 +82,17 @@ struct _pager_priv {
     guint desknum;
     guint curdesk;
     gint wallpaper;
+    gint icon_show;
+    gint icon_size;
+    gint icon_min_size;
+    gint names_show_in_pager;
+    gint names_show_in_tooltip;
+    gint names_height;
+    char *names_fmt;
+    GdkColor names_color_normal;
+    GdkColor names_color_active;
+    char **dnames;
+    gint dnames_num;
     //int dw, dh;
     gfloat /*scalex, scaley, */ratio;
     Window *wins;
@@ -80,14 +100,136 @@ struct _pager_priv {
     GHashTable* htable;
     task *focusedtask;
     FbBg *fbbg;
-    gint dah, daw;
+    gint dah, daw, dah2, daw2;
 };
-
-
 
 #define TASK_VISIBLE(tk)                            \
  (!( (tk)->nws.hidden || (tk)->nws.skip_pager ))
 
+#define ICON_MARGIN 1
+
+// from taskbar.c BEGIN //
+
+// TODO probably good idea is move this code from this file and from taskbar.c to panel/misc.c
+
+static void
+free_pixels (guchar *pixels, gpointer data)
+{
+    ENTER;
+    g_free (pixels);
+    RET();
+}
+
+static guchar *
+argbdata_to_pixdata (gulong *argb_data, int len)
+{
+    guchar *p, *ret;
+    int i;
+
+    ENTER;
+    ret = p = g_new (guchar, len * 4);
+    if (!ret)
+        RET(NULL);
+    /* One could speed this up a lot. */
+    i = 0;
+    while (i < len) {
+        guint32 argb;
+        guint32 rgba;
+
+        argb = argb_data[i];
+        rgba = (argb << 8) | (argb >> 24);
+
+        *p = rgba >> 24;
+        ++p;
+        *p = (rgba >> 16) & 0xff;
+        ++p;
+        *p = (rgba >> 8) & 0xff;
+        ++p;
+        *p = rgba & 0xff;
+        ++p;
+
+        ++i;
+    }
+    RET(ret);
+}
+
+static GdkPixbuf *
+get_netwm_icon(Window tkwin, int iw, int ih)
+{
+    gulong *data;
+    GdkPixbuf *ret = NULL;
+    int n;
+    guchar *p;
+    GdkPixbuf *src;
+    int w, h;
+
+    ENTER;
+    data = get_xaproperty(tkwin, a_NET_WM_ICON, XA_CARDINAL, &n);
+    if (!data)
+        RET(NULL);
+
+    /* loop through all icons in data to find best fit */
+    if (0) {
+        gulong *tmp;
+        int len;
+
+        len = n/sizeof(gulong);
+        tmp = data;
+        while (len > 2) {
+            int size = tmp[0] * tmp[1];
+            DBG("sub-icon: %dx%d %d bytes\n", tmp[0], tmp[1], size * 4);
+            len -= size + 2;
+            tmp += size;
+        }
+    }
+
+    if (0) {
+        int i, j, nn;
+
+        nn = MIN(10, n);
+        p = (guchar *) data;
+        for (i = 0; i < nn; i++) {
+            for (j = 0; j < sizeof(gulong); j++)
+                ERR("%02x ", (guint) p[i*sizeof(gulong) + j]);
+            ERR("\n");
+        }
+    }
+
+    /* check that data indeed represents icon in w + h + ARGB[] format
+     * with 16x16 dimension at least */
+    if (n < (16 * 16 + 1 + 1)) {
+        ERR("win %lx: icon is too small or broken (size=%d)\n", tkwin, n);
+        goto out;
+    }
+    w = data[0];
+    h = data[1];
+    /* check that sizes are in 64-256 range */
+    if (w < 16 || w > 256 || h < 16 || h > 256) {
+        ERR("win %lx: icon size (%d, %d) is not in 64-256 range\n",
+            tkwin, w, h);
+        goto out;
+    }
+
+    DBG("orig  %dx%d dest %dx%d\n", w, h, iw, ih);
+    p = argbdata_to_pixdata(data + 2, w * h);
+    if (!p)
+        goto out;
+    src = gdk_pixbuf_new_from_data (p, GDK_COLORSPACE_RGB, TRUE,
+        8, w, h, w * 4, free_pixels, NULL);
+    if (src == NULL)
+        goto out;
+    ret = src;
+    if (w != iw || h != ih) {
+        ret = gdk_pixbuf_scale_simple(src, iw, ih, GDK_INTERP_HYPER);
+        g_object_unref(src);
+    }
+
+out:
+    XFree(data);
+    RET(ret);
+}
+
+// from taskbar.c END //
 
 static void pager_rebuild_all(FbEv *ev, pager_priv *pg);
 static void desk_draw_bg(pager_priv *pg, desk *d1);
@@ -142,6 +284,8 @@ task_remove_stale(Window *win, task *t, pager_priv *p)
         if (p->focusedtask == t)
             p->focusedtask = NULL;
         DBG("del %lx\n", t->win);
+        if(t->icon)
+            g_object_unref(t->icon);
         g_free(t);
         return TRUE;
     }
@@ -152,6 +296,8 @@ task_remove_stale(Window *win, task *t, pager_priv *p)
 static gboolean
 task_remove_all(Window *win, task *t, pager_priv *p)
 {
+    if(t->icon)
+        g_object_unref(t->icon);
     g_free(t);
     return TRUE;
 }
@@ -192,6 +338,8 @@ task_update_pix(task *t, desk *d)
 {
     int x, y, w, h;
     GtkWidget *widget;
+    GdkPixbuf *icon_pixbuf;
+    gint icon_size;
 
     ENTER;
     g_return_if_fail(d->pix != NULL);
@@ -222,6 +370,28 @@ task_update_pix(task *t, desk *d)
           widget->style->fg_gc[GTK_STATE_NORMAL],
           FALSE,
           x, y, w, h);
+    if (d->pg->icon_show
+      && w > d->pg->icon_min_size  + 2 * ICON_MARGIN
+      && h > d->pg->icon_min_size + 2 * ICON_MARGIN) {
+        if (w < d->pg->icon_size + 2 * ICON_MARGIN
+          || h < d->pg->icon_size + 2 * ICON_MARGIN) {
+            icon_size = MIN(w - 2 * ICON_MARGIN, h - 2 * ICON_MARGIN);
+            icon_pixbuf = gdk_pixbuf_scale_simple(t->icon,icon_size, icon_size, GDK_INTERP_HYPER);
+        } else {
+            icon_size = d->pg->icon_size;
+            icon_pixbuf = t->icon;
+        }
+        gdk_draw_pixbuf(d->pix,
+              (d->pg->focusedtask == t) ?
+              widget->style->fg_gc[GTK_STATE_SELECTED] :
+              widget->style->fg_gc[GTK_STATE_NORMAL],
+              icon_pixbuf,
+              0, 0,
+              x + w/2 - icon_size/2, y + h/2 - icon_size/2,
+              icon_size, icon_size,
+              GDK_RGB_DITHER_NONE,
+              0, 0);
+    }
     RET();
 }
 
@@ -457,8 +627,36 @@ desk_new(pager_priv *pg, int i)
     d->no = i;
 
     d->da = gtk_drawing_area_new();
-    gtk_widget_set_size_request(d->da, pg->daw, pg->dah);
-    gtk_box_pack_start(GTK_BOX(pg->box), d->da, TRUE, TRUE, 0);
+
+    if (pg->names_show_in_pager) {
+        d->da_vbox =  gtk_vbox_new(TRUE, 1);
+
+        d->da_name_text =  gtk_label_new("name"); /// FIXME
+        gtk_misc_set_alignment(GTK_MISC(d->da_name_text), 0.5, 0.5);
+        gtk_misc_set_padding(GTK_MISC(d->da_name_text), 1, 0);
+        gtk_label_set_justify(GTK_LABEL(d->da_name_text), GTK_JUSTIFY_CENTER);
+        gtk_label_set_line_wrap(GTK_LABEL(d->da_name_text), TRUE);
+        gtk_label_set_ellipsize(GTK_LABEL(d->da_name_text), PANGO_ELLIPSIZE_START);
+
+        gtk_box_set_homogeneous(GTK_BOX(d->da_vbox), FALSE);
+        gtk_widget_set_size_request(d->da,      pg->daw2, pg->dah2);
+        gtk_widget_set_size_request(d->da_name_text, pg->daw2, pg->names_height);
+
+        d->da_name_box = gtk_bgbox_new();
+        gtk_widget_modify_bg(d->da_name_box, GTK_STATE_NORMAL, &pg->names_color_normal);
+
+        gtk_box_pack_start(GTK_BOX(pg->box), d->da_vbox, TRUE, TRUE, 0);
+        gtk_box_pack_start(GTK_BOX(d->da_vbox), d->da, TRUE, TRUE, 0);
+        gtk_box_pack_start(GTK_BOX(d->da_vbox), d->da_name_box, TRUE, TRUE, 0);
+        gtk_container_add(GTK_CONTAINER(d->da_name_box), d->da_name_text);
+
+        gtk_widget_show_all(d->da_name_text);
+        gtk_widget_show_all(d->da_vbox);
+    } else {
+        gtk_widget_set_size_request(d->da, pg->daw, pg->dah);
+        gtk_box_pack_start(GTK_BOX(pg->box), d->da, TRUE, TRUE, 0);
+    }
+
     gtk_widget_add_events (d->da, GDK_EXPOSURE_MASK
           | GDK_BUTTON_PRESS_MASK
           | GDK_BUTTON_RELEASE_MASK);
@@ -469,6 +667,7 @@ desk_new(pager_priv *pg, int i)
     g_signal_connect (G_OBJECT (d->da), "button_press_event",
          (GCallback) desk_button_press_event, (gpointer)d);
     gtk_widget_show_all(d->da);
+
     RET();
 }
 
@@ -530,12 +729,18 @@ do_net_current_desktop(FbEv *ev, pager_priv *pg)
     desk_set_dirty(pg->desks[pg->curdesk]);
     gtk_widget_set_state(pg->desks[pg->curdesk]->da, GTK_STATE_NORMAL);
     //pager_paint_frame(pg, pg->curdesk, GTK_STATE_NORMAL);
+    if (pg->names_show_in_pager)
+        gtk_widget_modify_bg(pg->desks[pg->curdesk]->da_name_box,
+            GTK_STATE_NORMAL, &pg->names_color_normal);
     pg->curdesk =  get_net_current_desktop ();
     if (pg->curdesk >= pg->desknum)
         pg->curdesk = 0;
     desk_set_dirty(pg->desks[pg->curdesk]);
     gtk_widget_set_state(pg->desks[pg->curdesk]->da, GTK_STATE_SELECTED);
     //pager_paint_frame(pg, pg->curdesk, GTK_STATE_SELECTED);
+    if (pg->names_show_in_pager)
+        gtk_widget_modify_bg(pg->desks[pg->curdesk]->da_name_box,
+            GTK_STATE_NORMAL, &pg->names_color_active);
     RET();
 }
 
@@ -571,6 +776,10 @@ do_net_client_list_stacking(FbEv *ev, pager_priv *p)
             t->desktop = get_net_wm_desktop(t->win);
             get_net_wm_state(t->win, &t->nws);
             get_net_wm_window_type(t->win, &t->nwwt);
+            if (p->icon_show)
+                t->icon = get_netwm_icon(t->win, p->icon_size, p->icon_size);
+            else
+                t->icon = NULL;
             task_get_sizepos(t);
             g_hash_table_insert(p->htable, &t->win, t);
             DBG("add %lx\n", t->win);
@@ -703,6 +912,30 @@ pager_bg_changed(FbBg *bg, pager_priv *pg)
     RET();
 }
 
+static  void
+update_names(GtkWidget *widget, pager_priv *pg)
+{
+    int i;
+    gchar *buf;
+
+    ENTER;
+    pg->desknum = get_net_number_of_desktops();
+    if (pg->dnames)
+        g_strfreev (pg->dnames);
+    pg->dnames = get_utf8_property_list(GDK_ROOT_WINDOW(), a_NET_DESKTOP_NAMES, &(pg->dnames_num));
+
+    for (i = 0; i < MIN(pg->desknum, pg->dnames_num); i++) {
+        if (pg->names_show_in_tooltip) {
+            gtk_widget_set_tooltip_markup(pg->desks[i]->da, pg->dnames[i]);
+        }
+        if (pg->names_show_in_pager) {
+            buf = g_strdup_printf(pg->names_fmt, pg->dnames[i]);
+            gtk_label_set_markup(GTK_LABEL(pg->desks[i]->da_name_text), buf);
+            g_free(buf);
+        }
+    }
+    RET();
+}
 
 static void
 pager_rebuild_all(FbEv *ev, pager_priv *pg)
@@ -740,17 +973,21 @@ pager_rebuild_all(FbEv *ev, pager_priv *pg)
             desk_new(pg, i);
     }
     g_hash_table_foreach_remove(pg->htable, (GHRFunc) task_remove_all, (gpointer)pg);
+    if (pg->names_show_in_pager || pg->names_show_in_tooltip)
+        update_names(NULL, pg);
     do_net_current_desktop(NULL, pg);
     do_net_client_list_stacking(NULL, pg);
 
     RET();
 }
 
+
 #define BORDER 1
 static int
 pager_constructor(plugin_instance *plug)
 {
     pager_priv *pg;
+    gchar *color_normal = NULL, *color_active = NULL;
 
     ENTER;
     pg = (pager_priv *) plug;
@@ -769,24 +1006,62 @@ pager_constructor(plugin_instance *plug)
     gtk_container_set_border_width (GTK_CONTAINER (plug->pwid), BORDER);
     gtk_container_add(GTK_CONTAINER(plug->pwid), pg->box);
 
-    pg->ratio = (gfloat)gdk_screen_width() / (gfloat)gdk_screen_height();
-    if (plug->panel->orientation == GTK_ORIENTATION_HORIZONTAL) {
-        pg->dah = plug->panel->ah - 2 * BORDER;
-        pg->daw = (gfloat) pg->dah * pg->ratio;
-    } else {
-        pg->daw = plug->panel->aw - 2 * BORDER;
-        pg->dah = (gfloat) pg->daw / pg->ratio;
-    }
     pg->wallpaper = 1;
+    pg->icon_show = 1;
+    pg->icon_size = 24;
+    pg->icon_min_size = 10;
+    pg->names_show_in_tooltip = 1;
+    pg->names_show_in_pager = 0;
+    pg->names_height = 17;
+    pg->names_fmt = "%s";
+    pg->dnames = NULL;
     //pg->scaley = (gfloat)pg->dh / (gfloat)gdk_screen_height();
     //pg->scalex = (gfloat)pg->dw / (gfloat)gdk_screen_width();
     XCG(plug->xc, "showwallpaper", &pg->wallpaper, enum, bool_enum);
+    XCG(plug->xc, "ShowIcon", &pg->icon_show, enum, bool_enum);
+    XCG(plug->xc, "IconSize", &pg->icon_size, int);
+    XCG(plug->xc, "IconMinSize", &pg->icon_min_size, int);
+    XCG(plug->xc, "ShowNamesInTooltip", &pg->names_show_in_tooltip, enum, bool_enum);
+    XCG(plug->xc, "ShowNamesInPager", &pg->names_show_in_pager, enum, bool_enum);
+    if (pg->names_show_in_pager) {
+        XCG(plug->xc, "NamesHeight", &pg->names_height, int);
+        XCG(plug->xc, "NamesFmt", &pg->names_fmt, str);
+
+        XCG(plug->xc, "NamesBackgroundNormal", &color_normal, str);
+        if (color_normal) {
+            gdk_color_parse(color_normal, &pg->names_color_normal);
+        } else {
+            gdk_color_parse("#cccccc", &pg->names_color_normal);
+        }
+
+        XCG(plug->xc, "NamesBackgroundActive", &color_active, str);
+        if (color_active) {
+            gdk_color_parse(color_active, &pg->names_color_active);
+        } else {
+            gdk_color_parse("#808080", &pg->names_color_active);
+        }
+    }
+
+    pg->ratio = (gfloat)gdk_screen_width() / (gfloat)gdk_screen_height();
+    if (plug->panel->orientation == GTK_ORIENTATION_HORIZONTAL) {
+        pg->dah = plug->panel->ah - 2 * BORDER;
+        pg->dah2 = pg->dah - pg->names_height;
+        pg->daw = (gfloat) pg->dah * pg->ratio;
+        pg->daw2 = (gfloat) pg->dah2 * pg->ratio;
+    } else {
+        pg->daw = plug->panel->aw - 2 * BORDER;
+        pg->daw2 = pg->daw;
+        pg->dah = (gfloat) pg->daw / pg->ratio;
+        pg->dah2 = pg->dah;
+    }
+
     if (pg->wallpaper) {
         pg->fbbg = fb_bg_get_for_display();
         DBG("get fbbg %p\n", pg->fbbg);
         g_signal_connect(G_OBJECT(pg->fbbg), "changed",
             G_CALLBACK(pager_bg_changed), pg);
     }
+
     pager_rebuild_all(fbev, pg);
 
     gdk_window_add_filter(NULL, (GdkFilterFunc)pager_event_filter, pg );
@@ -799,6 +1074,9 @@ pager_constructor(plugin_instance *plug)
           G_CALLBACK (pager_rebuild_all), (gpointer) pg);
     g_signal_connect (G_OBJECT (fbev), "client_list_stacking",
           G_CALLBACK (do_net_client_list_stacking), (gpointer) pg);
+    if (pg->names_show_in_pager || pg->names_show_in_tooltip)
+        g_signal_connect (G_OBJECT (fbev), "desktop_names",
+              G_CALLBACK (update_names), (gpointer) pg);
     RET(1);
 }
 
@@ -820,6 +1098,8 @@ pager_destructor(plugin_instance *p)
     while (pg->desknum--) {
         desk_free(pg, pg->desknum);
     }
+    if (pg->dnames)
+        g_strfreev(pg->dnames);
     g_hash_table_foreach_remove(pg->htable, (GHRFunc) task_remove_all,
             (gpointer)pg);
     g_hash_table_destroy(pg->htable);
