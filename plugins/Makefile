@@ -4,6 +4,7 @@ TOPDIR := ..
 
 SUBDIRS := battery \
     chart \
+    clip \
     cpu \
     dclock \
     deskno \
