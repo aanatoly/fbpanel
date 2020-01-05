@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <locale.h>
 
 
 #include "panel.h"
@@ -34,10 +35,23 @@ typedef struct {
     int timer;
     int show_calendar;
     int show_tooltip;
+    int numb_of_zones;
+    int curr_zone;
+    char **timezones;
+    char **locales;
 } tclock_priv;
 
+static void tclock_calendar_cleanup (GtkDialog *dialog, gint code, tclock_priv *dc) {
+    ENTER2;
+
+    gtk_widget_destroy(dc->calendar_window);
+    dc->calendar_window = NULL;
+
+    RET();
+}
+
 static GtkWidget *
-tclock_create_calendar(void)
+tclock_create_calendar(tclock_priv *dc)
 {
     GtkWidget *calendar, *win;
 
@@ -52,12 +66,23 @@ tclock_create_calendar(void)
     gtk_window_set_title(GTK_WINDOW(win), "calendar");
     gtk_window_stick(GTK_WINDOW(win));
 
+    if (dc->numb_of_zones > 0) {
+       if (dc->timezones[dc->curr_zone])
+          setenv("TZ", dc->timezones[dc->curr_zone], 1);
+       if (dc->locales[dc->curr_zone])
+          setlocale (LC_ALL, dc->locales[dc->curr_zone]);
+    }
+
     calendar = gtk_calendar_new();
     gtk_calendar_display_options(
         GTK_CALENDAR(calendar),
         GTK_CALENDAR_SHOW_WEEK_NUMBERS | GTK_CALENDAR_SHOW_DAY_NAMES
         | GTK_CALENDAR_SHOW_HEADING);
     gtk_container_add(GTK_CONTAINER(win), GTK_WIDGET(calendar));
+
+    g_signal_connect (win, "delete-event",
+                      G_CALLBACK (tclock_calendar_cleanup), dc);
+    // for set "dc->calendar_window == NULL" when user close via Alt+F4
 
     return win;
 }
@@ -75,6 +100,13 @@ clock_update(gpointer data)
     ENTER;
     g_assert(data != NULL);
     dc = (tclock_priv *)data;
+
+    if (dc->numb_of_zones > 0) {
+       if (dc->timezones[dc->curr_zone])
+          setenv("TZ", dc->timezones[dc->curr_zone], 1);
+       if (dc->locales[dc->curr_zone])
+          setlocale (LC_ALL, dc->locales[dc->curr_zone]);
+    }
 
     time(&now);
     detail = localtime(&now);
@@ -113,7 +145,7 @@ clicked(GtkWidget *widget, GdkEventButton *event, tclock_priv *dc)
     } else if (dc->show_calendar) {
         if (dc->calendar_window == NULL)
         {
-            dc->calendar_window = tclock_create_calendar();
+            dc->calendar_window = tclock_create_calendar(dc);
             gtk_widget_show_all(dc->calendar_window);
         }
         else
@@ -127,10 +159,25 @@ clicked(GtkWidget *widget, GdkEventButton *event, tclock_priv *dc)
     RET(TRUE);
 }
 
+static gboolean
+testev(GtkWidget *widget, GdkEventButton *event, tclock_priv *dc)
+{
+    ENTER;
+    dc->curr_zone++;
+    if (dc->curr_zone >= dc->numb_of_zones)
+        dc->curr_zone=0;
+    dc->lastDay = -1; // for refresh tooltip
+    clock_update(dc);
+    RET(TRUE);
+}
+
+
 static int
 tclock_constructor(plugin_instance *p)
 {
     tclock_priv *dc;
+    int i;
+    char buf[32];
 
     ENTER;
     dc = (tclock_priv *) p;
@@ -139,17 +186,41 @@ tclock_constructor(plugin_instance *p)
     dc->action = NULL;
     dc->show_calendar = TRUE;
     dc->show_tooltip = TRUE;
+    dc->numb_of_zones = 0;
+    dc->curr_zone = 0;
+    dc->timezones = NULL;
+    dc->locales = NULL;
     XCG(p->xc, "TooltipFmt", &dc->tfmt, str);
     XCG(p->xc, "ClockFmt", &dc->cfmt, str);
     XCG(p->xc, "Action", &dc->action, str);
     XCG(p->xc, "ShowCalendar", &dc->show_calendar, enum, bool_enum);
     XCG(p->xc, "ShowTooltip", &dc->show_tooltip, enum, bool_enum);
 
+    XCG(p->xc, "ZoneNum", &dc->numb_of_zones, int);
+    if (dc->numb_of_zones > 0) {
+        dc->timezones = calloc(dc->numb_of_zones, sizeof(char*));
+        dc->locales = calloc(dc->numb_of_zones, sizeof(char*));
+
+        for (i = 0; i < dc->numb_of_zones; i++) {
+            dc->timezones[i] = NULL;
+            sprintf(buf, "TimeZone%d", i);
+            XCG(p->xc, buf, &(dc->timezones[i]), str);
+
+            dc->locales[i] = NULL;
+            sprintf(buf, "Locale%d", i);
+            XCG(p->xc, buf, &(dc->locales[i]), str);
+        }
+    }
+
     dc->main = gtk_event_box_new();
     gtk_event_box_set_visible_window(GTK_EVENT_BOX(dc->main), FALSE);
     if (dc->action || dc->show_calendar)
         g_signal_connect (G_OBJECT (dc->main), "button_press_event",
               G_CALLBACK (clicked), (gpointer) dc);
+
+    if (dc->numb_of_zones > 1)
+        g_signal_connect_after(G_OBJECT(dc->main), "scroll-event",
+              G_CALLBACK(testev), (gpointer) dc);
 
     dc->clockw = gtk_label_new(NULL);
 
@@ -171,6 +242,11 @@ tclock_destructor( plugin_instance *p )
     tclock_priv *dc = (tclock_priv *) p;
 
     ENTER;
+    if (dc->timezones)
+        free(dc->timezones);
+    if (dc->locales)
+        free(dc->locales);
+
     if (dc->timer)
         g_source_remove(dc->timer);
     gtk_widget_destroy(dc->main);
