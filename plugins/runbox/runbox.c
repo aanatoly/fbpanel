@@ -6,6 +6,7 @@
 #define USE_DBUS
 #ifdef USE_DBUS
 #include <dbus/dbus.h>
+#include <dbus/dbus-glib-lowlevel.h>
 #endif
 
 #include <gdk-pixbuf/gdk-pixbuf.h>
