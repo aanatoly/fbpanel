@@ -20,7 +20,7 @@ SUBDIRS := battery \
     pager \
     separator \
     space \
-    systray \
+    tray \
     taskbar \
     tclock \
     volume \
