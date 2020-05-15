@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include "panel.h"
 
-struct _plugin_instance *stam;
+struct _plugin_instance;
 
 typedef struct {
     /* common */
