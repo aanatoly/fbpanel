@@ -1,2 +1,2 @@
 #include "eggmarshalers.h"
-#include "eggmarshalers.c"
+#include "eggmarshalers.c.inc"
