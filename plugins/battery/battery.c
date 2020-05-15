@@ -52,7 +52,7 @@ static gchar *batt_na[] = {
 };
 
 #if defined __linux__
-#include "os_linux.c"
+#include "os_linux.c.inc"
 #else
 
 static void
