@@ -231,9 +231,9 @@ mk_geom_block(xconf *xc)
     gconf_block_add(geom_block, gtk_label_new(_("Edge")), TRUE);
     gconf_block_add(geom_block, w, FALSE);
 
-    w = gconf_edit_enum(geom_block, xconf_get(xc, "allign"),
+    w = gconf_edit_enum(geom_block, xconf_get(xc, "align"),
         allign_enum);
-    gconf_block_add(geom_block, gtk_label_new(_("Allignment")), TRUE);
+    gconf_block_add(geom_block, gtk_label_new(_("Alignment")), TRUE);
     gconf_block_add(geom_block, w, FALSE);
     allign_opt = w;
 

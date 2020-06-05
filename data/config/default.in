@@ -23,7 +23,7 @@
 
 #     # allignment of a panel
 #     # legal values are: left, right, center
-#     allign = left
+#     align = left
 
 #     # length of margin (in pixels)
 #     # legal values are numbers
@@ -109,7 +109,7 @@
 
 Global {
     edge = bottom
-    allign = center
+    align = center
     margin = 0
     widthtype = percent
     width = 86
