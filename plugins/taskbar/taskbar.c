@@ -1165,7 +1165,7 @@ tb_propertynotify(taskbar_priv *tb, XEvent *ev)
             DBG("NET_WM_DESKTOP\n");
             tk->desktop = get_net_wm_desktop(win);
             tb_display(tb);
-        } else if (at == XA_WM_NAME) {
+        } else if (at == XA_WM_NAME || at == a_NET_WM_NAME) {
             DBG("WM_NAME\n");
             tk_get_names(tk);
             tk_set_names(tk);
