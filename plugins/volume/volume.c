@@ -52,7 +52,7 @@ oss_get_volume(volume_priv *c)
 
     ENTER;
     if (ioctl(c->fd, MIXER_READ(c->chan), &volume)) {
-        ERR("volume: can't get volume from /dev/mixer\n");
+        ERR("volume: can't get volume from /dev/mixer\n\n");
         RET(0);
     }
     volume &= 0xFF;
@@ -256,6 +256,9 @@ volume_constructor(plugin_instance *p)
     c = (volume_priv *) p;
     if ((c->fd = open ("/dev/mixer", O_RDWR, 0)) < 0) {
         ERR("volume: can't open /dev/mixer\n");
+        ERR("HINT: Do you have ALSA-OSS emulation loaded?\n");
+        ERR("HINT: Check out if you have 'snd-mixer-oss' kernel module loaded.\n");
+        ERR("HINT: Or disable 'volume' plugin at ~/.config/fbpanel/default.\n");
         RET(0);
     }
     k->set_icons(&c->meter, names);
