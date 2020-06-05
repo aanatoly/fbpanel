@@ -697,7 +697,7 @@ gchar *
 gdk_color_to_RRGGBB(GdkColor *color)
 {
     static gchar str[10]; // #RRGGBB + \0
-    g_sprintf(str, "#%02x%02x%02x",
+    g_snprintf(str, sizeof(str), "#%02x%02x%02x",
         color->red >> 8, color->green >> 8, color->blue >> 8);
     return str;
 }
