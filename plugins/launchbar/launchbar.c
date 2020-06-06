@@ -53,7 +53,7 @@ typedef struct btn {
     gchar *action;
 } btn;
 
-#define MAXBUTTONS 20
+#define MAXBUTTONS 40
 typedef struct launchbar_priv {
     plugin_instance plugin;
     GtkWidget *box;
