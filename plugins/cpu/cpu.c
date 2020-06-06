@@ -41,14 +41,17 @@ static int
 cpu_get_load_real(struct cpu_stat *cpu)
 {
     FILE *stat;
+    int res;
 
     memset(cpu, 0, sizeof(struct cpu_stat));
     stat = fopen("/proc/stat", "r");
     if(!stat)
         return -1;
-    if (fscanf(stat, "cpu %lu %lu %lu %lu %lu", &cpu->u, &cpu->n, &cpu->s,
-            &cpu->i, &cpu->w));
+
+    res = fscanf(stat, "cpu %lu %lu %lu %lu %lu", &cpu->u, &cpu->n, &cpu->s,
+            &cpu->i, &cpu->w);
     fclose(stat);
+    
     return 0;
 }
 #elif defined __FreeBSD__

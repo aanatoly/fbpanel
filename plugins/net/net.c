@@ -56,21 +56,25 @@ net_get_load_real(net_priv *c, struct net_stat *net)
 {
     FILE *stat;
     char buf[256], *s = NULL;
+    char *res;
 
     stat = fopen("/proc/net/dev", "r");
     if(!stat)
         return -1;
-    if (fgets(buf, 256, stat));
-    if (fgets(buf, 256, stat));
+
+    res = fgets(buf, 256, stat);
+    res = fgets(buf, 256, stat);
 
     while (!s && !feof(stat) && fgets(buf, 256, stat))
         s = g_strrstr(buf, c->iface);
     fclose(stat);
     if (!s)
         return -1;
+
     s = g_strrstr(s, ":");
     if (!s)
         return -1;
+
     s++;
     if (sscanf(s,
             "%lu  %*d     %*d  %*d  %*d  %*d   %*d        %*d       %lu",
@@ -78,6 +82,7 @@ net_get_load_real(net_priv *c, struct net_stat *net)
         DBG("can't read %s statistics\n", c->iface);
         return -1;
     }
+
     return 0;
 }
 
@@ -106,6 +111,7 @@ init_net_stats(net_priv *c)
     for (mib[4] = 1; mib[4] <= count; mib[4]++) {
         if (sysctl(mib, 6, (void *)&ifmd, &len, NULL, 0) != 0)
             continue;
+
         if (strcmp(ifmd.ifmd_name, c->iface) == 0) {
             c->ifmib_row = mib[4];
             break;
@@ -135,6 +141,7 @@ net_get_load_real(net_priv *c, struct net_stat *net)
 
     net->tx = ifmd.ifmd_data.ifi_obytes;
     net->rx = ifmd.ifmd_data.ifi_ibytes;
+
     return 0;
 }
 
@@ -230,4 +237,5 @@ static plugin_class class = {
     .constructor = net_constructor,
     .destructor  = net_destructor,
 };
+
 static plugin_class *class_ptr = (plugin_class *) &class;

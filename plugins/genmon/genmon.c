@@ -46,6 +46,7 @@ text_update(genmon_priv *gm)
     int text_len;
     char *markup;
     int len;
+    char *res;
 
     ENTER;
     fp = popen(gm->command, "r");
@@ -58,7 +59,7 @@ text_update(genmon_priv *gm)
     }
     /* Ensure null-termination even if read fails */
     text[0] = 0;
-    if (fgets(text, text_len, fp));
+    res = fgets(text, text_len, fp);
     pclose(fp);
     len = strlen(text) - 1;
     if (len >= 0) {
