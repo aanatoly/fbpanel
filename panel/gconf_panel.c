@@ -233,7 +233,7 @@ mk_geom_block(xconf *xc)
 
     w = gconf_edit_enum(geom_block, xconf_get(xc, "allign"),
         allign_enum);
-    gconf_block_add(geom_block, gtk_label_new(_("Allignment")), TRUE);
+    gconf_block_add(geom_block, gtk_label_new(_("Alignment")), TRUE);
     gconf_block_add(geom_block, w, FALSE);
     allign_opt = w;
 
