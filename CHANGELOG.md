@@ -1,3 +1,12 @@
+## Version: 7.1
+Date: 2020-06-07 20:20:00
+
+* Reimplement 'Xinerama support' patch for 7.0
+* Fix some deprecation warnings
+* Added plugin to display battery usage in text form
+* Added Italian translation
+* Added icon drawing support to the pager plugin
+* Some other assorted fixes
 
 ## Version: 7.0
 Date: 2015-12-05 08:25:36
