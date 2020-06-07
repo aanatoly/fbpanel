@@ -25,7 +25,7 @@ typedef struct {
 static  void
 clicked(GtkWidget *widget, deskno_priv *dc)
 {
-    if (system("xfce-setting-show workspaces"));
+    (void)system("xfce-setting-show workspaces");
 }
 
 static  void

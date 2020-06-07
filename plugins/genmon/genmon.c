@@ -47,7 +47,7 @@ text_update(genmon_priv *gm)
 
     ENTER;
     fp = popen(gm->command, "r");
-    if (fgets(text, sizeof(text), fp));
+    (void)fgets(text, sizeof(text), fp);
     pclose(fp);
     len = strlen(text) - 1;
     if (len >= 0) {

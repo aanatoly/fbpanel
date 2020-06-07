@@ -295,7 +295,7 @@ get_utf8_property_list(Window win, Atom atom, int *count)
         if (val[nitems-1]) {
             result = nitems - (s - val);
             DBG("val does not ends by 0, moving last %d bytes\n", result);
-            g_memmove(s - 1, s, result);
+            memmove(s - 1, s, result);
             val[nitems-1] = 0;
             DBG("s=%s\n", s -1);
             retval[i] = g_strdup(s - 1);
