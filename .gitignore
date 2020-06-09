@@ -2,3 +2,4 @@ config.mk
 config.h
 repl.py
 .config/*.pyc
+fbpanel.code-workspace
