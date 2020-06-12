@@ -1,3 +1,10 @@
+## Version: 7.2
+* Add cmake rules to build fbpanel
+* Get rid of previous python2-bsed build system
+* Update documetation
+* Extend max amount of buttons 20->40 on launchbar
+
+
 ## Version: 7.1
 
 Date: 2020-06-07 20:20:00
@@ -8,6 +15,7 @@ Date: 2020-06-07 20:20:00
 * Added Italian translation
 * Added icon drawing support to the pager plugin
 * Some other assorted fixes
+
 
 ## Version: 7.0
 

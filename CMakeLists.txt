@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 project(fbpanel VERSION 7.0 LANGUAGES C)
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 set(CMAKE_COLOR_MAKEFILE OFF)
-set(CMAKE_PROJECT_VERSION "7.1")
+set(CMAKE_PROJECT_VERSION "7.2")
 
 include(GNUInstallDirs)
 find_package(X11 REQUIRED)

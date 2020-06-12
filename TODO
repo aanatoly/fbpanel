@@ -1,9 +1,8 @@
 TODO List
 
-* Sort out documentation
 * Add first draft of Centos-7 spec-file (as an example)
-* Get rid of this build system (bring here autotools || cmake || meson, whatever makes it easy to complete)
-* Remove former github pages from this particular repo and move it to separate one.
+* Remove former github pages from this particular repo and move it to separate one
+* Split out libfbpanel and put there functions that are shared among fbpanel itself and its plugins
 
 Help wanted:
 * update ebuilds
