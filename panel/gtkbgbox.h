@@ -61,7 +61,7 @@ enum { BG_NONE, BG_STYLE, BG_ROOT, BG_INHERIT, BG_LAST };
 
 GType	   gtk_bgbox_get_type (void) G_GNUC_CONST;
 GtkWidget* gtk_bgbox_new (void);
-void gtk_bgbox_set_background (GtkWidget *widget, int bg_type, guint32 tintcolor, gint alpha);
+extern void gtk_bgbox_set_background (GtkWidget *widget, int bg_type, guint32 tintcolor, gint alpha);
 
 
 #ifdef __cplusplus
