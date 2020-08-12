@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include "panel.h"
 
-struct _plugin_instance *stam;
+struct _plugin_instance;
 
 typedef struct {
     /* common */
@@ -53,8 +53,8 @@ int plugin_start(plugin_instance *this);
 void plugin_stop(plugin_instance *this);
 GtkWidget *default_plugin_instance_edit_config(plugin_instance *pl);
 
-void class_register(plugin_class *p);
-void class_unregister(plugin_class *p);
+extern void class_register(plugin_class *p);
+extern void class_unregister(plugin_class *p);
 
 #ifdef PLUGIN
 static plugin_class *class_ptr;

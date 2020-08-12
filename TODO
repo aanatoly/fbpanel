@@ -1,0 +1,11 @@
+TODO List
+
+* Add first draft of Centos-7 spec-file (as an example)
+* Remove former github pages from this particular repo and move it to separate one
+* Split out libfbpanel and put there functions that are shared among fbpanel itself and its plugins
+
+Help wanted:
+* update ebuilds
+* new debian package stuff
+* other packaging artifacts for different systems and distributions
+* gtk-3 port

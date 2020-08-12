@@ -28,6 +28,7 @@ guint hpid; // hide panel thread id
 FbEv *fbev;
 gint force_quit = 0;
 int config;
+int xineramaHead = FBPANEL_INVALID_XINERAMA_HEAD;
 
 //#define DEBUGPRN
 #include "dbg.h"
@@ -895,6 +896,15 @@ do_argv(int argc, char *argv[])
             } else {
                 profile = g_strdup(argv[i]);
             }
+        } else if (!strcmp(argv[i], "--xineramaHead") ||
+                   !strcmp(argv[i], "-x")) {
+          i++;
+          if(i == argc) {
+            ERR("fbpanel: xinerama head not specified\n");
+            usage();
+            exit(1);
+          }
+          xineramaHead = atoi(argv[i]);
         } else {
             printf("fbpanel: unknown option - %s\n", argv[i]);
             usage();
@@ -958,6 +968,7 @@ main(int argc, char *argv[])
 
     do {
         the_panel = p = g_new0(panel, 1);
+        p->xineramaHead = xineramaHead;
         p->xc = xconf_new_from_file(profile_file, profile);
         if (!p->xc)
             exit(1);

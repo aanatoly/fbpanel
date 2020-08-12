@@ -13,9 +13,9 @@ int str2num(xconf_enum *p, gchar *str, int defval);
 gchar *num2str(xconf_enum *p, int num, gchar *defval);
 
 
-void Xclimsg(Window win, long type, long l0, long l1, long l2, long l3, long l4);
+extern void Xclimsg(Window win, long type, long l0, long l1, long l2, long l3, long l4);
 void Xclimsgwm(Window win, Atom type, Atom arg);
-void *get_xaproperty (Window win, Atom prop, Atom type, int *nitems);
+extern void *get_xaproperty (Window win, Atom prop, Atom type, int *nitems);
 char *get_textproperty(Window win, Atom prop);
 void *get_utf8_property(Window win, Atom atom);
 char **get_utf8_property_list(Window win, Atom atom, int *count);
@@ -24,10 +24,10 @@ void fb_init(void);
 void fb_free(void);
 //Window Select_Window(Display *dpy);
 guint get_net_number_of_desktops();
-guint get_net_current_desktop ();
-guint get_net_wm_desktop(Window win);
-void get_net_wm_state(Window win, net_wm_state *nws);
-void get_net_wm_window_type(Window win, net_wm_window_type *nwwt);
+extern guint get_net_current_desktop ();
+extern guint get_net_wm_desktop(Window win);
+extern void get_net_wm_state(Window win, net_wm_state *nws);
+extern void get_net_wm_window_type(Window win, net_wm_window_type *nwwt);
 
 void calculate_position(panel *np);
 gchar *expand_tilda(gchar *file);

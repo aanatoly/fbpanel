@@ -154,7 +154,7 @@ bat_new(gchar* path)
     tmp->path = path;
     tmp->name = NULL;
     tmp->status = NULL;
-    tmp->capacity = -1.0d;
+    tmp->capacity = -1;
     return tmp;
 }
 
@@ -206,12 +206,12 @@ bat_parse(bat* bat)
                 bat->capacity = g_ascii_strtod(tmp_value, NULL);
             } else { // for older kernels
                 tmp_value = (gchar*) g_hash_table_lookup(hash, SYS_ACPI_UEVENT_BAT_ENERGY_NOW_KEY);
-                gdouble tmp = -1.0d;
+                gdouble tmp = -1;
                 if (tmp_value != NULL) { // ac off
                     tmp = g_ascii_strtod(tmp_value, NULL);
                     tmp_value = (gchar*) g_hash_table_lookup(hash, SYS_ACPI_UEVENT_BAT_ENERGY_FULL_KEY);
-                    if (tmp_value != NULL && tmp > 0.0d) {
-                        tmp = tmp / g_ascii_strtod(tmp_value, NULL) * 100.0d;
+                    if (tmp_value != NULL && tmp > 0) {
+                        tmp = tmp / g_ascii_strtod(tmp_value, NULL) * 100;
                         bat->capacity = tmp;
                     }
                 } else {
@@ -219,8 +219,8 @@ bat_parse(bat* bat)
                     if (tmp_value != NULL) { // ac on
                         tmp = g_ascii_strtod(tmp_value, NULL);
                         tmp_value = (gchar*) g_hash_table_lookup(hash, SYS_ACPI_UEVENT_BAT_CHARGE_FULL_KEY);
-                        if (tmp_value != NULL && tmp > 0.0d) {
-                            tmp = tmp / g_ascii_strtod(tmp_value, NULL) * 100.0d;
+                        if (tmp_value != NULL && tmp > 0) {
+                            tmp = tmp / g_ascii_strtod(tmp_value, NULL) * 100;
                             bat->capacity = tmp;
                         }
                     }
@@ -327,7 +327,7 @@ power_supply_is_ac_online(power_supply* ps)
 extern gdouble
 power_supply_get_bat_capacity(power_supply* ps)
 {
-    gdouble total_bat_capacity = 0.0d;
+    gdouble total_bat_capacity = 0;
     guint bat_count = 0;
     GSequenceIter* it;
     bat* battery;
@@ -335,7 +335,7 @@ power_supply_get_bat_capacity(power_supply* ps)
         it = g_sequence_get_begin_iter(ps->bat_list);
         while (!g_sequence_iter_is_end(it)) {
             battery = (bat*) g_sequence_get(it);
-            if (battery->capacity > 0.0d) {
+            if (battery->capacity > 0) {
                 total_bat_capacity = total_bat_capacity + battery->capacity;
             }
             bat_count++;

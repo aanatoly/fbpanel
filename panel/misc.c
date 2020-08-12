@@ -295,7 +295,7 @@ get_utf8_property_list(Window win, Atom atom, int *count)
         if (val[nitems-1]) {
             result = nitems - (s - val);
             DBG("val does not ends by 0, moving last %d bytes\n", result);
-            g_memmove(s - 1, s, result);
+            memmove(s - 1, s, result);
             val[nitems-1] = 0;
             DBG("s=%s\n", s -1);
             retval[i] = g_strdup(s - 1);
@@ -569,21 +569,40 @@ calculate_width(int scrw, int wtype, int allign, int xmargin,
 void
 calculate_position(panel *np)
 {
+    int positionSet = 0;
     int sswidth, ssheight, minx, miny;
 
     ENTER;
-    if (0)  {
-        //if (np->curdesk < np->wa_len/4) {
-        minx = np->workarea[np->curdesk*4 + 0];
-        miny = np->workarea[np->curdesk*4 + 1];
-        sswidth  = np->workarea[np->curdesk*4 + 2];
-        ssheight = np->workarea[np->curdesk*4 + 3];
-    } else {
+
+    /* If a Xinerama head was specified on the command line, then
+     * calculate the location based on that.  Otherwise, just use the
+     * screen dimensions. */
+    if(np->xineramaHead != FBPANEL_INVALID_XINERAMA_HEAD) {
+      GdkScreen *screen = gdk_screen_get_default();
+      int nDisplay = gdk_screen_get_n_monitors(screen);
+      GdkRectangle rect;
+
+      if(np->xineramaHead < nDisplay) {
+        gdk_screen_get_monitor_geometry(screen, np->xineramaHead, &rect);
+        minx = rect.x;
+        miny = rect.y;
+        sswidth = rect.width;
+        ssheight = rect.height;
+        positionSet = 1;
+      }
+    }
+
+    if (!positionSet)  {
         minx = miny = 0;
         sswidth  = gdk_screen_width();
         ssheight = gdk_screen_height();
 
     }
+
+    np->screenRect.x = minx;
+    np->screenRect.y = miny;
+    np->screenRect.width = sswidth;
+    np->screenRect.height = ssheight;
 
     if (np->edge == EDGE_TOP || np->edge == EDGE_BOTTOM) {
         np->aw = np->width;
@@ -697,7 +716,7 @@ gchar *
 gdk_color_to_RRGGBB(GdkColor *color)
 {
     static gchar str[10]; // #RRGGBB + \0
-    g_sprintf(str, "#%02x%02x%02x",
+    g_snprintf(str, sizeof(str), "#%02x%02x%02x",
         color->red >> 8, color->green >> 8, color->blue >> 8);
     return str;
 }
@@ -705,50 +724,60 @@ gdk_color_to_RRGGBB(GdkColor *color)
 void
 menu_pos(GtkMenu *menu, gint *x, gint *y, gboolean *push_in, GtkWidget *widget)
 {
-    int w, h;
+    GdkRectangle menuRect;
+    GdkRectangle validRect = the_panel->screenRect;
 
     ENTER;
-    *push_in = TRUE;
-    if (!widget) {
-        gdk_display_get_pointer(gdk_display_get_default(), NULL, x, y, NULL);
-        DBG("mouse pos: x %d, y %d\n", *x, *y);
-        DBG("menu pos: x %d, y %d\n", *x, *y);
-        RET();
-    }
-    DBG("widget: x %d, y %d, w %d, h %d\n",
-        widget->allocation.x,
-        widget->allocation.y,
-        widget->allocation.width,
-        widget->allocation.height);
-    gdk_window_get_origin(widget->window, x, y);
-    DBG("window pos: x %d, y %d\n", *x, *y);
-    DBG("edge: %s\n", num2str(edge_enum, the_panel->edge, "xz"));
-    if (the_panel->edge == EDGE_TOP) {
-        *y += widget->allocation.height;
-        *y += widget->allocation.y;
-        *x += widget->allocation.x;
-    } else if (the_panel->edge == EDGE_LEFT) {
-        *x += widget->allocation.width;
-        *y += widget->allocation.y;
-        *x += widget->allocation.x;
+
+    /* "validRect" is a rectangle of the valid location to place the menu. */
+    if(the_panel->orientation == GTK_ORIENTATION_HORIZONTAL) {
+      validRect.height -= the_panel->ah;
+      if(the_panel->edge == EDGE_TOP) {
+        validRect.y += the_panel->ah;
+      }
     } else {
-        w = GTK_WIDGET(menu)->requisition.width;
-        h = GTK_WIDGET(menu)->requisition.height;
-        if (the_panel->edge == EDGE_BOTTOM) {
-            *x += widget->allocation.x;
-            *y += widget->allocation.y;
-            *y -= h;
-            if (*y < 0)
-                *y = 0;
-        } else if (the_panel->edge == EDGE_RIGHT) {
-            *y += widget->allocation.y;
-            *x -= w;
-            *x -= widget->allocation.x;
-            if (*x < 0)
-                *x = 0;
-        }
+      validRect.width -= the_panel->aw;
+      if(the_panel->edge == EDGE_LEFT) {
+        validRect.x += the_panel->aw;
+      }
     }
-    DBG("menu pos: x %d, y %d\n", *x, *y);
+
+    /* Calculate a requested location based on the widget/mouse location,
+     * relative to the root window. */
+    if (widget) {
+        gdk_window_get_origin(widget->window, &menuRect.x, &menuRect.y);
+        menuRect.x += widget->allocation.x;
+        menuRect.y += widget->allocation.y;
+    } else {
+        gdk_display_get_pointer(gdk_display_get_default(), NULL, 
+                                &menuRect.x, &menuRect.y, NULL);
+        menuRect.x -= 20;
+        menuRect.y -= 20;
+    }
+
+    menuRect.width = GTK_WIDGET(menu)->requisition.width;
+    menuRect.height = GTK_WIDGET(menu)->requisition.height;
+
+    /* If "menuRect" does not fall within "validRect", then move "menuRect"
+     * to fit. */
+    if(menuRect.x + menuRect.width > validRect.x + validRect.width) {
+      menuRect.x = validRect.x + validRect.width - menuRect.width;
+    }
+    if(menuRect.x < validRect.x) {
+      menuRect.x = validRect.x;
+    }
+    if(menuRect.y + menuRect.height > validRect.y + validRect.height) {
+      menuRect.y = validRect.y + validRect.height - menuRect.height;
+    }
+    if(menuRect.y < validRect.y) {
+      menuRect.y = validRect.y;
+    }
+
+    *x = menuRect.x;
+    *y = menuRect.y;
+
+    DBG("w-h %d %d\n", menuRect.width, menuRect.height);
+    *push_in = TRUE;
     RET();
 }
 
@@ -816,6 +845,10 @@ fb_pixbuf_make_back_image(GdkPixbuf *front, gulong hicolor)
     int i;
 
     ENTER;
+    if(!front)
+    {
+        RET(front);
+    }
     back = gdk_pixbuf_add_alpha(front, FALSE, 0, 0, 0);
     if (!back) {
         g_object_ref(G_OBJECT(front));
@@ -846,6 +879,10 @@ fb_pixbuf_make_press_image(GdkPixbuf *front)
     int w, h;
 
     ENTER;
+    if(!front)
+    {
+        RET(front);
+    }
     w = gdk_pixbuf_get_width(front) - 2 * PRESS_GAP;
     h = gdk_pixbuf_get_height(front) - 2 * PRESS_GAP;
     press = gdk_pixbuf_copy(front);
